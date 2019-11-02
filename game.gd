@@ -1,14 +1,30 @@
 extends Node
 
+var game_state
+
 func _ready():
 	network.current_map = self
+	# Connect gamestate
+	game_state = preload("res://engine/game_state/game_state.tscn").instance()
+	add_child(game_state)
+	game_state.connect("got_state", self, "_state_loaded")
+	
 	add_child(preload("res://engine/camera.tscn").instance())
 	add_child(preload("res://ui/hud.tscn").instance())
+
 	add_new_player(get_tree().get_network_unique_id())
-	
 	network.update_maps()
 	
 	screenfx.play("fadein")
+	screenfx.stop() # Wait for the first frame
+	
+	# Should keep the effect white until we get the gamestate from the server, if needed.
+	set_process(false)
+
+func _state_loaded():
+	print('Screen can be visible now.')
+	set_process(true)	
+	screenfx.play()
 
 func _process(delta):
 	var visible_enemies = []

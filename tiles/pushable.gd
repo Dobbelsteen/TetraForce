@@ -2,7 +2,9 @@ extends StaticBody2D
 
 signal on_done_moving
 
-export(float) var time_for_effect = 1.0
+export(float) var time_for_effect = 0.4
+export(float) var push_animation_duration = 1.0
+
 export(bool) var is_one_shot = false
 export(Array) var direction_limits
 
@@ -89,7 +91,7 @@ remote func _do_move(direction):
 	time_being_pushed = 0.0
 	
 	remove_from_group("pushable")
-	tween.interpolate_property(self,"position",position,destination,1,Tween.TRANS_LINEAR,Tween.EASE_IN)
+	tween.interpolate_property(self,"position",position,destination,push_animation_duration,Tween.TRANS_LINEAR,Tween.EASE_IN)
 	tween.start()
 
 
@@ -98,15 +100,15 @@ func _ask_coords():
 	var owner_id = network.map_owners[network.current_map.name]
 	var own_id =  get_tree().get_network_unique_id()
 	
-	if own_id != owner_id:
-		rpc_id(owner_id, "_get_state", own_id)
+	if network.is_scene_owner():
+		rpc_id(network.get_current_map_owner(), "_get_state")
 
 
 # Function called when peer requests pushable state
-remote func _get_state(peer_id):
+remote func _get_state():
 	# Only need to return the state if the object has been pushed, otherwise we can ignore this request
 	if has_been_pushed:
-		rpc_id(peer_id, "_update_state", destination)
+		rpc_id(get_tree().get_rpc_sender_id(), "_update_state", destination)
 
 
 # Function called when peer recieves updated pushable state
