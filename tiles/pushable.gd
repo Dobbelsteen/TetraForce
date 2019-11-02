@@ -100,7 +100,7 @@ func _ask_coords():
 	var owner_id = network.map_owners[network.current_map.name]
 	var own_id =  get_tree().get_network_unique_id()
 	
-	if network.is_current_map_owner():
+	if network.is_scene_owner():
 		rpc_id(network.get_current_map_owner(), "_get_state")
 
 

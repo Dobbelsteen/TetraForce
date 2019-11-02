@@ -19,7 +19,7 @@ func _ready() -> void:
 
 
 func _prepare() -> void:
-	if network.is_current_map_owner():
+	if network.is_scene_owner():
 		entered_new_scene_as_owner()
 	else:
 		client_joined_scene()
