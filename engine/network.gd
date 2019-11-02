@@ -7,12 +7,13 @@ var current_players = []
 var map_owners = {}
 var map_peers = []
 
+var current_player_id = 0
 var player_data = {}
 
 var my_player_data = {
 	skin ="res://player/player.png",
 	name = "", 
-	}
+}
 
 var clock
 
@@ -32,11 +33,19 @@ func initialize():
 	
 	if get_tree().is_network_server():
 		player_data[1] = my_player_data
-	
-	rpc_id(1, "_receive_my_player_data", get_tree().get_network_unique_id(), my_player_data)
+	# Store this value for easier access later
+	current_player_id = get_tree().get_network_unique_id()
+	rpc_id(1, "_receive_my_player_data", my_player_data)
 
-remote func _receive_my_player_data(id, new_player_data):
-	
+func get_current_map_owner():
+	return network.map_owners[network.current_map.name]
+
+func is_current_map_owner():
+	# Player will be the map owner if the map is not active yet, or if it's the owner
+	return !network.map_owners.has(network.current_map.name) || network.map_owners[network.current_map.name] == current_player_id
+
+remote func _receive_my_player_data(new_player_data):
+	var id = get_tree().get_rpc_sender_id()
 	var collision_count = 0
 	var player_name = new_player_data.name
 	
@@ -111,7 +120,7 @@ func _update_map_owners():
 
 # client only, sends current_map to server
 func _send_current_map():
-	rpc_id(1, "_receive_current_map", get_tree().get_network_unique_id(), current_map.name)
+	rpc_id(1, "_receive_current_map", current_player_id, current_map.name)
 
 # server only, updates active_maps
 remote func _receive_current_map(id, map):
