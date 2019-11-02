@@ -30,7 +30,7 @@ __meta__ = {
 [node name="ObjectPlacer" parent="." instance=ExtResource( 4 )]
 position = Vector2( 1, 0 )
 z_index = 100
-tile_data = PoolIntArray( 262149, 0, 0, 262169, 1, 0, 262170, 1, 0, 262171, 1, 0, 262172, 1, 0, 327699, 2, 0 )
+tile_data = PoolIntArray( 131092, 6, 0, 196629, 6, 0, 262149, 0, 0, 262169, 1, 0, 262170, 1, 0, 262171, 1, 0, 262172, 1, 0, 327699, 2, 0 )
 
 [node name="Sign" parent="." instance=ExtResource( 5 )]
 position = Vector2( 184, 23 )
@@ -48,6 +48,7 @@ position = Vector2( 264, 72 )
 
 [node name="Pushable" parent="." instance=ExtResource( 8 )]
 position = Vector2( 296, 40 )
+freeze_source_during_animation = true
 is_one_shot = true
 direction_limits = [ Vector2( -1, 0 ) ]
 

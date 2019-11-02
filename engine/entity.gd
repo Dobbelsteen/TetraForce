@@ -32,7 +32,7 @@ onready var anim = $AnimationPlayer
 onready var sprite = $Sprite
 var hitbox # to be defined by create_hitbox()
 
-onready var camera = get_parent().get_node("Camera")
+var camera
 
 var texture_default = null
 var entity_shader = preload("res://engine/entity.shader")
@@ -50,13 +50,18 @@ func _ready():
 	health = MAX_HEALTH
 	home_position = position
 	create_hitbox()
-	
+
 	if TYPE == "ENEMY":
 		add_to_group("enemy")
 		set_collision_layer_bit(0,0)
 		set_collision_mask_bit(0,0)
 		set_collision_layer_bit(1,1)
 		set_collision_mask_bit(1,1)
+
+func is_scene_owner():
+    if network.map_owners[network.current_map.name] == get_tree().get_network_unique_id():
+        return true
+    return false
 
 func create_hitbox():
 	var new_hitbox = Area2D.new()
@@ -84,10 +89,6 @@ func loop_network():
 func puppet_update():
 	pass
 
-func is_scene_owner():
-	if network.map_owners[network.current_map.name] == get_tree().get_network_unique_id():
-		return true
-	return false
 
 func loop_movement():
 	var motion
@@ -178,7 +179,7 @@ sync func use_item(item, input):
 	newitem.add_to_group(name)
 	add_child(newitem)
 	
-	if is_network_master():
+	if is_scene_owner():
 		newitem.set_network_master(get_tree().get_network_unique_id())
 	
 	if get_tree().get_nodes_in_group(itemgroup).size() > newitem.MAX_AMOUNT:

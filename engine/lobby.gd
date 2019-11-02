@@ -9,10 +9,12 @@ onready var host = settings.get_pref("host_address")
 #### Network callbacks from SceneTree ####
 
 func create_level():
+	# TODO: Should only do this if network is actually active? Or part of it. Maybe just handle it from network
 	network.initialize()
 	network.set_process(true)
 	var level = load(map).instance()
 	get_tree().get_root().add_child(level)
+	
 	hide()
 
 # callback from SceneTree

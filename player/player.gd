@@ -49,7 +49,7 @@ func set_player_label(player_name):
 
 func _physics_process(delta):
 	# puppet
-	if !is_network_master():
+	if network.is_active && !is_network_master(): # Verify we're the play via the network singleton, to make it work in single player
 		position = puppet_pos
 		spritedir = puppet_spritedir
 		sprite.texture = texture_default
@@ -207,7 +207,9 @@ func hide_inventory():
 func state_inventory():
 	if Input.is_action_just_pressed("ui_select"):
 		hide_inventory()
+		
 func connect_camera():
+	camera = get_parent().get_node("Camera")
 	camera.connect("screen_change_started", self, "screen_change_started")
 	camera.connect("screen_change_completed", self, "screen_change_completed")
 

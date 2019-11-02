@@ -4,26 +4,23 @@ signal on_done_moving
 
 export(float) var time_for_effect = 0.4
 export(float) var push_animation_duration = 1.0
-
+export(bool) var freeze_source_during_animation = false
 export(bool) var is_one_shot = false
 export(Array) var direction_limits
-
 
 var has_been_pushed = false
 var time_being_pushed = 0.0
 var is_moving = false
-
+var source
 
 onready var tween := $Tween
 onready var ray := $RayCast2D
 onready var destination := position
 
 
-
 func _ready():
 	set_physics_process(false)
 	add_to_group("pushable")
-	
 	
 	$Tween.connect("tween_completed", self, "_done_moving")
 	# Ask for pushable state if needed (this must be deferred because the map_owners variable is 1 tick late after this _ready)
@@ -43,6 +40,10 @@ func interact(node):
 	# If we have passed the time_for_effect treshold, initialize the move
 	if time_being_pushed > time_for_effect:
 		time_being_pushed = 0.0
+		
+		if freeze_source_during_animation:
+			source = node
+			source.state = "busy"
 		_prepare_move(node.spritedir)
 
 
@@ -55,6 +56,11 @@ func stop_interact():
 # Pushable has stopped moving (callback from tween_completed)
 func _done_moving(node, key) -> void:
 	is_moving = false
+
+	# Unfreeze source if needed
+	if freeze_source_during_animation && source:
+		source.state = "default"
+		source = null
 	
 	emit_signal('on_done_moving') # Signal anyone who cares
 	# If pushable is not a one shot, add it back to the pushable group
@@ -97,10 +103,7 @@ remote func _do_move(direction):
 
 # If we're not the map_owner, ask host for updated pushable state
 func _ask_coords():
-	var owner_id = network.map_owners[network.current_map.name]
-	var own_id =  get_tree().get_network_unique_id()
-	
-	if network.is_current_map_owner():
+	if !network.is_scene_owner():
 		rpc_id(network.get_current_map_owner(), "_get_state")
 
 

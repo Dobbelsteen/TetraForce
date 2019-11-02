@@ -19,7 +19,7 @@ func _ready() -> void:
 
 
 func _prepare() -> void:
-	if network.is_current_map_owner():
+	if network.is_scene_owner():
 		entered_new_scene_as_owner()
 	else:
 		client_joined_scene()
@@ -42,7 +42,7 @@ func left_scene_as_owner():
 	# Assign new master chosen from peers (next in line), but send it to all peers.
 	# If the new owner is already gone, the next in line attempts to become the owner, and so on
 	var peers = network.map_peers
-	if peers.count() > 0:
+	if peers.size() > 0:
 		var new_owner_id = peers[0]
 		
 		for peer in peers:

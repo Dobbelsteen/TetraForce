@@ -1,6 +1,6 @@
 extends Entity
 
-var movetimer_length = 15
+var movetimer_length = 40
 var movetimer = 0
 
 func _ready():
