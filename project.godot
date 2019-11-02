@@ -52,10 +52,11 @@ config/icon="res://icon.png"
 
 sfx="*res://engine/sound.gd"
 global="*res://engine/global.gd"
-network="*res://engine/network.gd"
+network="*res://engine/new_network.gd"
 screenfx="*res://engine/screenfx.tscn"
 settings="*res://engine/settings.gd"
 network_debugger="*res://engine/debug/network_debugger.tscn"
+world_state="*res://engine/game_state/world_state.tscn"
 
 [debug]
 

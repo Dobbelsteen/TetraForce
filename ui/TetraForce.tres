@@ -5,7 +5,7 @@
 [ext_resource path="res://ui/buttonpush.png" type="Texture" id=3]
 [ext_resource path="res://ui/monogram.tres" type="DynamicFont" id=4]
 
-[sub_resource type="StyleBoxTexture" id=5]
+[sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 1 )
 region_rect = Rect2( 0, 0, 64, 64 )
 margin_left = 3.95062
@@ -13,7 +13,7 @@ margin_right = 3.95062
 margin_top = 3.95062
 margin_bottom = 3.95062
 
-[sub_resource type="StyleBoxTexture" id=6]
+[sub_resource type="StyleBoxTexture" id=2]
 texture = ExtResource( 2 )
 region_rect = Rect2( 0, 0, 64, 64 )
 margin_left = 3.87855
@@ -21,7 +21,7 @@ margin_right = 4.27625
 margin_top = 4.15466
 margin_bottom = 4.00477
 
-[sub_resource type="StyleBoxTexture" id=7]
+[sub_resource type="StyleBoxTexture" id=3]
 texture = ExtResource( 3 )
 region_rect = Rect2( 0, 0, 64, 64 )
 margin_left = 4.07814
@@ -43,9 +43,9 @@ Button/constants/hseparation = 2
 Button/fonts/font = null
 Button/styles/disabled = null
 Button/styles/focus = null
-Button/styles/hover = SubResource( 5 )
-Button/styles/normal = SubResource( 6 )
-Button/styles/pressed = SubResource( 7 )
+Button/styles/hover = SubResource( 1 )
+Button/styles/normal = SubResource( 2 )
+Button/styles/pressed = SubResource( 3 )
 Panel/styles/panel = SubResource( 4 )
 VScrollBar/icons/decrement = null
 VScrollBar/icons/decrement_highlight = null

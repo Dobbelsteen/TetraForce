@@ -16,13 +16,12 @@ func _ready():
 	network.update_maps()
 	
 	screenfx.play("fadein")
-	screenfx.stop() # Wait for the first frame
+	screenfx.stop() # Wait on the first frame until state is loaded
 	
 	# Should keep the effect white until we get the gamestate from the server, if needed.
 	set_process(false)
 
 func _state_loaded():
-	print('Screen can be visible now.')
 	set_process(true)	
 	screenfx.play()
 

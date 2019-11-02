@@ -19,6 +19,8 @@ func _ready() -> void:
 
 
 func _prepare() -> void:
+	network_debugger.write_log("Is network active ?" + str(network.is_active))
+	
 	if network.is_scene_owner():
 		entered_new_scene_as_owner()
 	else:
@@ -32,6 +34,7 @@ func entered_new_scene_as_owner():
 	#keep track of ALL scene changes
 	_got_state = true
 	emit_signal("got_state")
+	network_debugger.write_log("Initialized state as scene owner")
 
 
 func _prepare_data(): # Called on _ready
@@ -61,6 +64,8 @@ remote func _get_state_from_owner(state):
 	updated_state = state
 	_got_state = true
 	emit_signal("got_state")
+	network_debugger.write_log("Got state from scene owner")
+	
 
 
 func client_joined_scene():
