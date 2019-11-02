@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://engine/debug/network_debugger.gd" type="Script" id=1]
+[ext_resource path="res://ui/TetraForce.tres" type="Theme" id=2]
+
+[node name="NetworkDebuggerNode" type="CanvasLayer"]
+scale = Vector2( 0.25, 0.25 )
+transform = Transform2D( 0.25, 0, 0, 0.25, 0, 0 )
+
+[node name="NetworkDebugger" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+
+[node name="Logger" type="TextEdit" parent="NetworkDebugger"]
+margin_left = 692.598
+margin_top = 3.50388
+margin_right = 1024.6
+margin_bottom = 156.504
+theme = ExtResource( 2 )
+
+[node name="RichLogger" type="RichTextLabel" parent="NetworkDebugger"]
+margin_left = 694.122
+margin_top = 10.832
+margin_right = 1019.12
+margin_bottom = 153.832
+theme = ExtResource( 2 )
+text = "Debug Log
+"
