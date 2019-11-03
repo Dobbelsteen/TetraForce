@@ -13,7 +13,6 @@ func _ready():
 	add_child(preload("res://ui/hud.tscn").instance())
 
 	add_new_player(get_tree().get_network_unique_id())
-	network.update_maps()
 	
 	screenfx.play("fadein")
 	screenfx.stop() # Wait on the first frame until state is loaded

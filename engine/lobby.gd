@@ -11,26 +11,11 @@ var connection_success = false
 var map = "res://maps/overworld.tscn"
 onready var host = settings.get_pref("host_address")
 
-#### Network callbacks from SceneTree ####
-
-func create_level():
-	network.initialize()
-	network.set_process(true)
-	var level = load(map).instance()
-	get_tree().get_root().add_child(level)
-	hide()
-
-# callback from SceneTree
-func _player_connected(id):
-	return
-	#someone connected, start the game!
-	create_level()
-	
-	hide()
 
 # callback from SceneTree, only for clients (not server)
 func _connected_ok():
-	create_level()
+	world_state.disconnect("got_world_state", self, "_connected_ok")	
+	hide()
 	
 # callback from SceneTree, only for clients (not server)	
 func _connected_fail():
@@ -82,7 +67,6 @@ func check_host_address(ip: String) -> String:
 
 func _on_host_pressed():
 	network.my_player_data.name = $characterselect.player_name
-	network.current_player_id = 1
 	
 	var ip = get_node("panel/address").get_text()
 	
@@ -97,14 +81,12 @@ func _on_host_pressed():
 		_set_status("Can't host, address in use.",false)
 		return
 	
-	
 	get_tree().set_network_peer(host)
 	get_node("panel/join").set_disabled(true)
 	get_node("panel/host").set_disabled(true)
 	
-	world_state.prepare_world_state()
-	
-	create_level()
+	world_state.prepare_world_state(true)
+	call_deferred("hide")
 
 func _on_join_pressed():
 	network.my_player_data.name = $characterselect.player_name
@@ -114,8 +96,11 @@ func _on_join_pressed():
 	if ip == null:
 		return
 	
+	get_node("panel/join").set_disabled(true)
+	get_node("panel/host").set_disabled(true)
+	
 	#connect("client_connected_to_server", self, "_connected_ok")
-	world_state.prepare_world_state()
+	world_state.prepare_world_state(false)
 	# Once we get the world state, we can create the actual level.
 	world_state.connect("got_world_state", self, "_connected_ok")
 	
@@ -124,7 +109,7 @@ func _on_join_pressed():
 	host.create_client(ip,DEFAULT_PORT)
 	get_tree().set_network_peer(host)
 	
-	_set_status("Connecting..",true)
+	_set_status("Connecting...",true)
 	
 
 	
@@ -134,8 +119,7 @@ func _ready():
 	$panel/address.text = host
 	
 	# connect all the callbacks related to networking
-	get_tree().connect("network_peer_connected",self,"_player_connected")
-	#get_tree().connect("connected_to_server",self,"_connected_ok")
+	# get_tree().connect("network_peer_connected",self,"_player_connected")
 	get_tree().connect("connection_failed",self,"_connected_fail")
 	get_tree().connect("server_disconnected",self,"_server_disconnected")
 	

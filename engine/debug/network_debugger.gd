@@ -21,40 +21,34 @@ func _process(delta: float) -> void:
 		_write_to_log()
 
 func write_log(message):
-	logger.text += "\n\n>>> MSG: " + str(message) + "\n"
+	logger.text += "\n>>> MSG: " + str(message) + "\n"
 
 func _write_to_log():
 	var new_log = ""
-	new_log += "\nMy network ID: " + str(network.current_player_id)	
-	new_log += "\nIs network active? " + str(network.is_active)
+	new_log += "\nMy network ID: " + str(world_state.player_id)	
+	new_log += "\nIs Map owner ?: " + str(world_state.is_map_owner)	
+	new_log += "\nIs World owner ?: " + str(world_state.is_world_owner)	
+	new_log += "\nMy network ID: " + str(world_state.player_id)	
 	
-	if network.is_active:
-		new_log += "\nCurrent map: " + str(network.current_map.name)
-		new_log += "\nIs scene owner? " + str(network.is_scene_owner())
-		
-		new_log += "\nActive maps:"
-		
-		var active_maps = network.active_maps
-		for p in active_maps:
-			new_log += str(p) + ":" + str(active_maps[p]) + ", "
 	
-		new_log += "\nActive players:"
+	new_log += "\nWorld state players:"
+	var players = world_state.players
+	for p in players:
+		new_log += str(p) + ":" + str(world_state.players[p]) + ", "
 	
-		for p in network.current_players:
-			new_log += str(p) + ", "
-			
-		new_log += "\nActive map peers:"
-		
-		for p in network.map_peers:
-			new_log += str(p) + ", "
-			
-	new_log += "\nActive map owners:"
-	var map_owners = network.map_owners
+	new_log += "\nWorld state map_owners:"
+	var map_owners = world_state.map_owners
 	for p in map_owners:
-		new_log += str(p) + ":" + str(map_owners[p]) + ", "
+		new_log += str(p) + ":" + str(world_state.map_owners[p]) + ", "
 	
+	new_log += "\nWorld state map_peers:"
+	var map_peers = world_state.map_peers
+	for p in map_peers:
+		new_log += str(p) + ":" + str(world_state.map_peers[p]) + ", "
+		
 	new_log += "\n==== END OF LOG ====="
 	logger.text += new_log
+	return
 
 func _player_connected(id):
 	var new_log = "\nCONNECTED " + str(id)

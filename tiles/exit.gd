@@ -14,7 +14,7 @@ func body_entered(body):
 		var root = old_map.get_parent()
 		var new_map = load(map).instance()
 		
-		network.announce_map_change(new_map.name)
+		world_state.announce_map_change(new_map.name)
 		
 		yield(screenfx, "animation_finished")
 		

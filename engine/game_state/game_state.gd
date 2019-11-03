@@ -19,8 +19,6 @@ func _ready() -> void:
 
 
 func _prepare() -> void:
-	network_debugger.write_log("Is network active ?" + str(network.is_active))
-	
 	if network.is_scene_owner():
 		entered_new_scene_as_owner()
 	else:

@@ -67,8 +67,10 @@ func create_hitbox():
 	hitbox = new_hitbox
 
 func loop_network():
-	set_network_master(network.map_owners[network.current_map.name])
-	if !network.map_owners[network.current_map.name] == get_tree().get_network_unique_id():
+	if !world_state.is_multiplayer:
+		return
+	set_network_master(world_state.map_owners[network.current_map.name])
+	if !world_state.is_map_owner:
 		puppet_update()
 	if position == Vector2(0,0):
 		hide()
@@ -79,9 +81,10 @@ func puppet_update():
 	pass
 
 func is_scene_owner():
-	if network.map_owners[network.current_map.name] == get_tree().get_network_unique_id():
-		return true
-	return false
+	return world_state.is_map_owner
+	#if network.map_owners[network.current_map.name] == get_tree().get_network_unique_id():
+	#	return true
+	#return false
 
 func loop_movement():
 	var motion
@@ -126,9 +129,11 @@ func loop_damage():
 	
 	if hitstun > 1:
 		hitstun -= 1
-		rpc_unreliable("hurt_texture")
+		sync_function_unreliable("hurt_texture")
+		hurt_texture()
 	elif hitstun == 1:
-		rpc("default_texture")
+		sync_function("default_texture")
+		default_texture()
 		hitstun -= 1
 	
 	for area in hitbox.get_overlapping_areas():
@@ -144,7 +149,8 @@ func loop_damage():
 			sfx.play(load(HURT_SOUND))
 			
 			if body.has_method("hit"):
-				body.rpc("hit")
+				for peer in network.map_peers:
+					body.rpc_id(peer, "hit")
 				body.hit()
 
 func update_health(delta):
@@ -216,6 +222,14 @@ func rset_unreliable_map(property, value):
 	for peer in network.map_peers:
 		rset_unreliable_id(peer, property, value)
 
+func sync_function(f):
+	for peer in network.map_peers:
+		rpc_id(peer, f)
+		
+func sync_function_unreliable(f):
+	for peer in network.map_peers:
+		rpc_unreliable_id(peer, f)
+	
 func sync_property(property, value):
 	if TYPE == "PLAYER":
 		if !is_network_master(): 

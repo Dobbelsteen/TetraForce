@@ -24,7 +24,6 @@ func _ready():
 	set_physics_process(false)
 	add_to_group("pushable")
 	
-	
 	$Tween.connect("tween_completed", self, "_done_moving")
 	# Ask for pushable state if needed (this must be deferred because the map_owners variable is 1 tick late after this _ready)
 	call_deferred("_ask_coords")
@@ -97,10 +96,7 @@ remote func _do_move(direction):
 
 # If we're not the map_owner, ask host for updated pushable state
 func _ask_coords():
-	var owner_id = network.map_owners[network.current_map.name]
-	var own_id =  get_tree().get_network_unique_id()
-	
-	if network.is_scene_owner():
+	if !world_state.is_map_owner:
 		rpc_id(network.get_current_map_owner(), "_get_state")
 
 
