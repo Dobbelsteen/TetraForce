@@ -10,6 +10,8 @@ func body_entered(body):
 		body.state = "interact"
 		screenfx.play("fadewhite")
 		
+		global.get_player_state()
+		
 		var old_map = get_parent()
 		var root = old_map.get_parent()
 		var new_map = load(map).instance()
