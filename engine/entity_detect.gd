@@ -9,8 +9,8 @@ func _process(delta):
 	if !is_instance_valid(player):
 		remove_from_group("entity_detect")
 		queue_free()
-	
-	position = get_grid_pos(player.position) * Vector2(256, 144)
+	else:
+		position = get_grid_pos(player.position) * Vector2(256, 144)
 
 func get_grid_pos(pos):
 	var x = floor(pos.x / 256)

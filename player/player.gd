@@ -176,7 +176,7 @@ func loop_inventory():
 	for btn in ["B", "A", "X", "Y"]:
 		if Input.is_action_just_pressed(btn) && action_cooldown == 0 && equip_slot[btn] >= 0:
 			use_item(item_resources[equip_slot[btn]], btn)
-			for peer in network.map_peers:
+			for peer in world_state.local_peers:
 				rpc_id(peer, "use_item", item_resources[equip_slot[btn]], btn)
 				
 	if Input.is_action_just_pressed("ui_select") && action_cooldown == 0:

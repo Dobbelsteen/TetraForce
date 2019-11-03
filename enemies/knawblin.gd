@@ -32,7 +32,7 @@ func _physics_process(delta):
 	
 	if movetimer == 25:
 		use_item("res://items/arrow.tscn", "A")
-		for peer in network.map_peers:
+		for peer in world_state.local_peers:
 			rpc_id(peer, "use_item", "res://items/arrow.tscn", "A")
 
 func puppet_update():

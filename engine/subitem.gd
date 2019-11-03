@@ -15,7 +15,7 @@ func pickup(player):
 	pass
 
 func delete():
-	for peer in network.map_peers:
+	for peer in world_state.local_peers:
 		rpc_id(peer, "_remote_delete")
 	queue_free()
 	pass

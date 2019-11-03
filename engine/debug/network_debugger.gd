@@ -9,7 +9,6 @@ var timer = 0
 func _ready() -> void:
 	print("debugging...")
 	hide()
-	
 	call_deferred("_write_to_log")
 	get_tree().connect("network_peer_connected", self, "_player_connected")
 	get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
@@ -41,10 +40,10 @@ func _write_to_log():
 	for p in map_owners:
 		new_log += str(p) + ":" + str(world_state.map_owners[p]) + ", "
 	
-	new_log += "\nWorld state map_peers:"
-	var map_peers = world_state.map_peers
-	for p in map_peers:
-		new_log += str(p) + ":" + str(world_state.map_peers[p]) + ", "
+	new_log += "\nWorld state local_peers:"
+	var local_peers = world_state.local_peers
+	for p in local_peers:
+		new_log += str(p) + ", "
 		
 	new_log += "\n==== END OF LOG ====="
 	logger.text += new_log

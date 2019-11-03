@@ -69,7 +69,7 @@ func create_hitbox():
 func loop_network():
 	if !world_state.is_multiplayer:
 		return
-	set_network_master(world_state.map_owners[network.current_map.name])
+	set_network_master(world_state.map_owners[world_state.local_map.name])
 	if !world_state.is_map_owner:
 		puppet_update()
 	if position == Vector2(0,0):
@@ -82,9 +82,6 @@ func puppet_update():
 
 func is_scene_owner():
 	return world_state.is_map_owner
-	#if network.map_owners[network.current_map.name] == get_tree().get_network_unique_id():
-	#	return true
-	#return false
 
 func loop_movement():
 	var motion
@@ -149,7 +146,7 @@ func loop_damage():
 			sfx.play(load(HURT_SOUND))
 			
 			if body.has_method("hit"):
-				for peer in network.map_peers:
+				for peer in world_state.local_peers:
 					body.rpc_id(peer, "hit")
 				body.hit()
 
@@ -202,9 +199,9 @@ func choose_subitem(possible_drops, drop_chance):
 		
 		if typeof(drop_choice) != TYPE_INT:
 			var subitem_name = str(randi()) # we need to sync names to ensure the subitem can rpc to the same thing for others
-			network.current_map.spawn_subitem(drop_choice, global_position, subitem_name) # has to be from game.gd bc the node might have been freed beforehand
-			for peer in network.map_peers:
-				network.current_map.rpc_id(peer, "spawn_subitem", drop_choice, global_position, subitem_name)
+			world_state.local_map.spawn_subitem(drop_choice, global_position, subitem_name) # has to be from game.gd bc the node might have been freed beforehand
+			for peer in world_state.local_peers:
+				world_state.local_map.rpc_id(peer, "spawn_subitem", drop_choice, global_position, subitem_name)
 
 sync func enemy_death():
 	if is_scene_owner():
@@ -215,19 +212,19 @@ sync func enemy_death():
 	queue_free()
 
 func rset_map(property, value):
-	for peer in network.map_peers:
+	for peer in world_state.local_peers:
 		rset_id(peer, property, value)
 
 func rset_unreliable_map(property, value):
-	for peer in network.map_peers:
+	for peer in world_state.local_peers:
 		rset_unreliable_id(peer, property, value)
 
 func sync_function(f):
-	for peer in network.map_peers:
+	for peer in world_state.local_peers:
 		rpc_id(peer, f)
 		
 func sync_function_unreliable(f):
-	for peer in network.map_peers:
+	for peer in world_state.local_peers:
 		rpc_unreliable_id(peer, f)
 	
 func sync_property(property, value):

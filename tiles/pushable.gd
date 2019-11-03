@@ -75,7 +75,7 @@ func _prepare_move(dir):
 	
 	_do_move(direction)
 	# Notify peers that pushable has started moving
-	for peer in network.map_peers:
+	for peer in world_state.local_peers:
 		rpc_id(peer, "_do_move", direction)
 
 
@@ -97,7 +97,7 @@ remote func _do_move(direction):
 # If we're not the map_owner, ask host for updated pushable state
 func _ask_coords():
 	if !world_state.is_map_owner:
-		rpc_id(network.get_current_map_owner(), "_get_state")
+		rpc_id(world_state.local_map_owner, "_get_state")
 
 
 # Function called when peer requests pushable state

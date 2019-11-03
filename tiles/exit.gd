@@ -15,7 +15,7 @@ func body_entered(body):
 		var new_map = load(map).instance()
 		
 		world_state.announce_map_change(new_map.name)
-		
+		world_state.local_map = new_map
 		yield(screenfx, "animation_finished")
 		
 		root.call_deferred("add_child", new_map)

@@ -15,21 +15,10 @@ var my_player_data = {
 	name = "", 
 }
 
-var clock
-
 func _ready():
 	set_process(false)
 
-
 func initialize():
-	clock = Timer.new()
-	clock.wait_time = 0.1 # TODO: Restore clock time to 0.1
-	clock.one_shot = false
-	#clock.owner = self
-	add_child(clock)
-	clock.start()
-	clock.connect("timeout", self, "clock_update")
-	
 	if world_state.is_world_owner:
 		player_data[1] = my_player_data
 	# Store this value for easier access later
@@ -38,8 +27,9 @@ func initialize():
 	if world_state.player_id != 1:
 		rpc_id(1, "_receive_my_player_data", my_player_data)
 
+
 func get_current_map_owner():
-	return world_state.map_owners[current_map.name]
+	return world_state.map_owners[world_state.current_map.name]
 
 func is_scene_owner():
 	return world_state.is_map_owner
@@ -62,8 +52,7 @@ remote func _receive_my_player_data(new_player_data):
 func clear():
 	if is_instance_valid(current_map):
 		current_map.free()
-	if is_instance_valid(clock):
-		clock.stop()
+
 	active_maps.clear()
 	current_players.clear()
 	map_owners.clear()
@@ -72,9 +61,6 @@ func clear():
 
 remote func _receive_all_player_data(received_player_data):
 	player_data = received_player_data
-
-func clock_update():
-	current_map.update_players()
 
 
 func _get_player_name(player_name, collision_count):

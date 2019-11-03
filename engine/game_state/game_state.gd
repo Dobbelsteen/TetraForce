@@ -15,18 +15,18 @@ var _got_state = false # whether a client got the state of the server yet or not
 signal got_state
 
 func _ready() -> void:
-	call_deferred("_prepare")
+	call_deferred("_prepare") # Wait 1 tick to make sure data is properly set on world
 
 
 func _prepare() -> void:
-	if network.is_scene_owner():
-		entered_new_scene_as_owner()
+	if world_state.is_map_owner:
+		_owner_joined_scene()
 	else:
-		client_joined_scene()
+		_client_joined_scene()
 
 
-func entered_new_scene_as_owner():
-	owner_id = network.current_player_id
+func _owner_joined_scene():
+	owner_id = world_state.player_id
 	_prepare_data()
 	# Connect self to stuff
 	#keep track of ALL scene changes
@@ -39,38 +39,22 @@ func _prepare_data(): # Called on _ready
 	pass # Do eventual caching/encoding for optimalizations, for now, does nothing as we just return data as is
 
 
-func left_scene_as_owner():
-	# Assign new master chosen from peers (next in line), but send it to all peers.
-	# If the new owner is already gone, the next in line attempts to become the owner, and so on
-	var peers = network.map_peers
-	if peers.count() > 0:
-		var new_owner_id = peers[0]
-		
-		for peer in peers:
-			rpc_id(peer, "_assign_new_owner", new_owner_id)
-	pass
-	
-	# NOTE: Assuming we get these values properly from network, we shouldn't even have to do this call.
-
-
 remote func _send_state_to_peer():
+	network_debugger.write_log("Sending state to new player...")
 	# We can get the sender id from this handy method, instead of sending it along again
 	rpc_id(get_tree().get_rpc_sender_id(), "_get_state_from_owner", updated_state)
-
 
 remote func _get_state_from_owner(state):
 	updated_state = state
 	_got_state = true
 	emit_signal("got_state")
 	network_debugger.write_log("Got state from scene owner")
+
+func _client_joined_scene():
+	owner_id = world_state.get_local_map_owner()
+	network_debugger.write_log("Asking state from " + str(owner_id))
 	
-
-
-func client_joined_scene():
-	owner_id = network.get_current_map_owner()
-	# Fadein should be started, and wait
 	rpc_id(owner_id, "_send_state_to_peer")
-	
 	_timer = Timer.new()
 	_timer.set_wait_time(SERVER_TIMEOUT)
 	_timer.set_one_shot(true)
@@ -87,15 +71,13 @@ func _on_server_timeout():
 		return # Everything was fine
 	
 	if _connects_attempted <= CONNECT_ATTEMPTS:
-		client_joined_scene() # Just try again
+		_client_joined_scene() # Just try again
 		return
 	# If we get here, the server timed out. We are the server now? So we keep track of the changes from now on.
 	# Or, if there's other peers, the second in line becomes owner
 	_timer.queue_free()
-	_assign_new_owner(network.current_player_id)
-	for peer in network.map_peers:
-		rpc_id(peer, "_assign_new_owner", network.current_player_id)
-
-
-remote func _assign_new_owner(new_owner_id):
-	owner_id = new_owner_id 
+	world_state.announce_map_change(world_state.local_map.name)
+	# TODO: Proper handling of ownership change on timeout..
+	#_assign_new_owner(world_state.player_id)
+	#for peer in network.map_peers:
+	#	rpc_id(peer, "_assign_new_owner", world_state.player_id)

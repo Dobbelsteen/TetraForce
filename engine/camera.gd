@@ -24,10 +24,10 @@ func initialize(node):
 	
 	set_process(true)
 
-func _process(delta):
-	if target == null:
+func _process(delta): # TODO: Probably don't have to do this in process
+	if !is_instance_valid(target):
 		return
-	
+		
 	target_grid_pos = get_grid_pos(target.position)
 	
 	camera_rect = Rect2(position, SCREEN_SIZE)

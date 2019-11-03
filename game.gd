@@ -3,7 +3,8 @@ extends Node
 var game_state
 
 func _ready():
-	network.current_map = self
+	world_state.local_map = self
+	
 	# Connect gamestate
 	game_state = preload("res://engine/game_state/game_state.tscn").instance()
 	add_child(game_state)
@@ -11,9 +12,12 @@ func _ready():
 	
 	add_child(preload("res://engine/camera.tscn").instance())
 	add_child(preload("res://ui/hud.tscn").instance())
-
-	add_new_player(get_tree().get_network_unique_id())
 	
+	add_new_player(world_state.player_id)
+	for peer in world_state.local_peers:
+		add_new_player(peer)
+
+	# TODO: Failsafe, in case player can't get state from current owner
 	screenfx.play("fadein")
 	screenfx.stop() # Wait on the first frame until state is loaded
 	
@@ -24,7 +28,7 @@ func _state_loaded():
 	set_process(true)	
 	screenfx.play()
 
-func _process(delta):
+func _process(delta): # TODO: Can improve this to make it trigger once every map change
 	var visible_enemies = []
 	for entity_detect in get_tree().get_nodes_in_group("entity_detect"):
 		for entity in entity_detect.get_overlapping_bodies():
@@ -55,37 +59,13 @@ func add_new_player(id):
 		new_player.get_node("Sprite").texture = load(network.my_player_data.skin)
 		new_player.texture_default = load(network.my_player_data.skin)
 		new_player.set_player_label(network.my_player_data.name)
-
 	else:
 		new_player.get_node("Sprite").texture = load(network.player_data.get(id).skin)
 		new_player.texture_default = load(network.player_data.get(id).skin)
 		new_player.set_player_label(network.player_data.get(id).name)
 
 func remove_player(id):
-	get_node(str(id)).queue_free()
-	for node in get_tree().get_nodes_in_group(str(id)):
-		node.queue_free()
-
-func update_players():
-	var player_nodes = get_tree().get_nodes_in_group("player")
-	var map_peers = []
-	for peer in network.map_peers:
-		map_peers.append(peer)
-	
-	var player_names = []
-	for player in player_nodes:
-		# first try to remove old players
-		var id = int(player.name)
-		if !map_peers.has(id) && id != get_tree().get_network_unique_id():
-			remove_player(id)
-		
-		# add player names to an array
-		player_names.append(int(player.name))
-	
-	# now try to add new players
-	for id in map_peers:
-		if !player_names.has(id):
-			add_new_player(id)
+	get_node(str(id)).queue_free() # TODO: Make sure all other player nodes are gone?
 
 remote func spawn_subitem(dropped, pos, subitem_name):
 	var drop_instance = load(dropped).instance()
