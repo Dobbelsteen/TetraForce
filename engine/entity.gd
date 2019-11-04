@@ -219,7 +219,7 @@ func choose_subitem(possible_drops, drop_chance):
 				world_state.local_map.rpc_id(peer, "spawn_subitem", drop_choice, global_position, subitem_name)
 
 func send_chat_message(source, text):
-	network.current_map.receive_chat_message(source, text)
+	world_state.local_map.receive_chat_message(source, text)
 	rpc("receive_chat_message", source, text)
 
 sync func enemy_death():

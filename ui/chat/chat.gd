@@ -36,9 +36,9 @@ func show_all():
 
 func send_message_global(source, text):
 	print_debug("Marco")
-	network.current_map.receive_chat_message(source, text)
-	for peer in network.map_peers:
-		network.current_map.rpc_id(peer, "receive_chat_message", source, text)
+	world_state.local_map.receive_chat_message(source, text)
+	for peer in world_state.local_peers:
+		world_state.local_map.rpc_id(peer, "receive_chat_message", source, text)
 	
 func is_typing():
 	if $EditMessage.has_focus():

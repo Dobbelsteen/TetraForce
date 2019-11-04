@@ -10,14 +10,12 @@ func _ready():
 	pass
 
 func body_entered(body):
-	if world_state.player_id == int(body.name):
 	if get_tree().get_network_unique_id() == int(body.name):
 		pickup(body)
 
 func area_entered(area):
 	if area.get_parent().name == "Sword":
 		var player = area.get_parent().get_parent()
-		if world_state.player_id == int(player.name):
 		if get_tree().get_network_unique_id() == int(player.name):
 			pickup(player)
 

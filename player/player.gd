@@ -136,11 +136,11 @@ func state_fall():
 		state = "default"
 
 func state_menu():
-	if Input.is_action_just_pressed("ui_select") && network.current_map.get_node("HUD/Inventory"):
-		network.current_map.get_node("HUD/Inventory").queue_free()
+	if Input.is_action_just_pressed("ui_select") && world_state.local_map.get_node("HUD/Inventory"):
+		world_state.local_map.get_node("HUD/Inventory").queue_free()
 		state = "default"
-	elif Input.is_action_just_pressed("TOGGLE_CHAT") && network.current_map.get_node("HUD/Chat"):
-		network.current_map.get_node("HUD/Chat").queue_free()
+	elif Input.is_action_just_pressed("TOGGLE_CHAT") && world_state.local_map.get_node("HUD/Chat"):
+		world_state.local_map.get_node("HUD/Chat").queue_free()
 		state = "default"
 
 func loop_controls():
@@ -190,14 +190,17 @@ func loop_action_button():
 			state = "menu"
 		
 func show_inventory():
+	return
 	var inventory = preload("res://ui/inventory/inventory.tscn").instance()
 	world_state.local_map.get_node("HUD").add_child(inventory)
 	inventory.player = self
 	inventory.start()
 
 func show_chat():
+	return
+	
 	var chat = preload("res://ui/chat/chat.tscn").instance()
-	network.current_map.get_node("HUD").add_child(chat)
+	world_state.local_map.get_node("HUD").add_child(chat)
 	chat.message_log = chat_messages
 	chat.start()
 
