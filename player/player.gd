@@ -158,8 +158,6 @@ func loop_interact():
 			position.y += 2
 			sfx.play(preload("res://player/player_jump.wav"), 20)
 			state = "fall"
-		elif collider.is_in_group("subitem"):
-			collider.on_pickup(self)
 		elif movedir != Vector2.ZERO && is_on_wall() && collider.is_in_group("pushable"):
 			collider.interact(self)
 			push_target = collider
@@ -184,12 +182,12 @@ func show_inventory():
 	action_cooldown = 5
 	state = "inventory"
 	var inventory = preload("res://ui/inventory/inventory.tscn").instance()
-	network.current_map.get_node("HUD").add_child(inventory)
+	world_state.local_map.get_node("HUD").add_child(inventory)
 	inventory.player = self
 	inventory.start()
 	
 func hide_inventory():
-	network.current_map.get_node("HUD/Inventory").queue_free()
+	world_state.local_map.get_node("HUD/Inventory").queue_free()
 	state = "default"
 
 func update_item_resources():
@@ -204,9 +202,11 @@ func connect_camera():
 
 func screen_change_started():
 	set_physics_process(false)
+	room.remove_entity(self)
 
 func screen_change_completed():
 	set_physics_process(true)
+	room.add_entity(self)
 
 func _on_HoldTimer_timeout():
 	spinAtk = true

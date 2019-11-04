@@ -15,6 +15,8 @@ var my_player_data = {
 	name = "", 
 }
 
+var rooms = {} #{Vector2: Room}
+
 func _ready():
 	set_process(false)
 
@@ -75,3 +77,39 @@ func _check_dupe_name(player_name):
 			return true
 			
 	return false
+
+
+func get_room_screen(pos: Vector2) -> Vector2:
+	return Vector2(floor(pos.x / 16 / 16), floor(pos.y / 9 / 16))
+
+func get_room(pos) -> Room :
+	var screen = get_room_screen(pos)
+	if rooms.has(screen) :
+		return rooms[screen]
+
+	else :
+		# create room
+		var r = Room.new()
+		r.tile_rect.position = screen * Vector2(16, 9)
+
+		r.connect("player_entered", self, "_on_room_player_entered", [r])
+		r.connect("player_exited", self, "_on_room_player_exited", [r])
+		r.connect("enemies_defeated", self, "_on_room_enemies_defeated", [r])
+		r.connect("empty", self, "_on_room_empty", [r])
+
+		rooms[screen] = r
+		return r
+
+func _on_room_player_entered(room):
+	print(room, "player_entered")
+
+func _on_room_player_exited(room):
+	print(room, "player_exited")
+
+func _on_room_enemies_defeated(room):
+	print(room, "enemies_defeated")
+
+func _on_room_empty(room):
+	# free the room once it's clear
+	print(room.get_class())
+	rooms.erase(room)

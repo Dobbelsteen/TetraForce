@@ -1,6 +1,6 @@
-extends Subitem
+extends Droppable
 
-func pickup(player):
+func on_pickup(player):
 	print_debug("Got a heart!")
 	player.update_health(1)
 	delete()

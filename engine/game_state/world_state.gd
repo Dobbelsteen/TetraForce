@@ -44,6 +44,13 @@ func prepare_world_state(is_owner) -> void:
 		_client_joined_world()
 
 
+# Should be called by exits/teleports to annouce a player changing maps
+func announce_map_change(map):
+	network_debugger.write_log("Me, Player " + str(player_id) + " changed map to " + map)
+	_player_enters_map(player_id, map)
+	rpc("_notify_player_map_change", map)
+
+
 func _create_world(id): # Create the world for a player_id
 	_add_player(id)
 	
@@ -68,7 +75,6 @@ func _owner_joined_world():
 	_create_world(1)
 
 
-
 func _add_player(id):
 	_player_enters_map(id, START_SCENE_NAME)
 
@@ -79,13 +85,6 @@ func _player_disconnected(id):
 	
 	if players.size() == 1:
 		is_multiplayer = false
-
-
-# Should be called by exits/teleports to annouce a player changing maps
-func announce_map_change(map):
-	network_debugger.write_log("Me, Player " + str(player_id) + " changed map to " + map)
-	_player_enters_map(player_id, map)
-	rpc("_notify_player_map_change", map)
 
 
 remote func _notify_player_map_change(map):
