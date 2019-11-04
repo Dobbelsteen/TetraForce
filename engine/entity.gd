@@ -55,6 +55,8 @@ func _ready():
 	home_position = position
 	create_hitbox()
 	
+	get_parent().connect("player_entered", self, "player_entered")
+	
 	room = network.get_room(position)
 	room.add_entity(self)
 
@@ -88,6 +90,12 @@ func puppet_update():
 
 func is_scene_owner():
 	return world_state.is_map_owner
+
+
+func is_dead():
+	if health <= 0 && hitstun == 0:
+		return true
+	return false
 
 func loop_movement():
 	var motion
@@ -210,13 +218,27 @@ func choose_subitem(possible_drops, drop_chance):
 			for peer in world_state.local_peers:
 				world_state.local_map.rpc_id(peer, "spawn_subitem", drop_choice, global_position, subitem_name)
 
+func send_chat_message(source, text):
+	network.current_map.receive_chat_message(source, text)
+	rpc("receive_chat_message", source, text)
+
 sync func enemy_death():
 	if is_scene_owner():
 		choose_subitem(["HEALTH", "RUPEE"], 100)
+	room.remove_entity(self)
 	var death_animation = preload("res://enemies/enemy_death.tscn").instance()
 	death_animation.global_position = global_position
 	get_parent().add_child(death_animation)
-	queue_free()
+	
+	set_dead()
+
+remote func set_dead():
+	hide()
+	set_physics_process(false)
+	set_process(false)
+	home_position = Vector2(0,0)
+	position = Vector2(0,0)
+	health = -1
 
 func rset_map(property, value):
 	for peer in world_state.local_peers:
@@ -251,3 +273,7 @@ func sync_property_unreliable(property, value):
 		if !is_scene_owner():
 			return
 	rset_unreliable_map(property, value)
+
+func player_entered(id):
+	if is_scene_owner() && is_dead():
+		rpc_id(id, "set_dead")

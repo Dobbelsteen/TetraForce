@@ -1,5 +1,5 @@
 extends Droppable
 	
-func on_pickup(player):
+func pickup(player):
 	print_debug("Got a rupee!")
 	delete()
