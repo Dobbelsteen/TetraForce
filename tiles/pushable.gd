@@ -24,13 +24,10 @@ func _ready():
 	add_to_group("pushable")
 	
 	$Tween.connect("tween_completed", self, "_done_moving")
-	world_state.connect('got_world_state', self, "_update_state")
 	
 	var new_state = world_state.get_value(self.name)
 	if new_state != null:
 		_update_state(new_state)
-	# Ask for pushable state if needed (this must be deferred because the map_owners variable is 1 tick late after this _ready)
-	#call_deferred("_ask_coords")
 
 
 func interact(node):
@@ -59,7 +56,6 @@ func stop_interact():
 func _done_moving(node, key) -> void:
 	is_moving = false
 	world_state.set_value(self.name, destination)
-	print(world_state.updated_state)
 	
 	emit_signal('on_done_moving') # Signal anyone who cares
 	# If pushable is not a one shot, add it back to the pushable group
@@ -80,6 +76,10 @@ func _prepare_move(dir):
 		return # Pushable has limited directions, and this is an invalid direction, can't move
 	
 	_do_move(direction)
+	
+	# Can immediatly set the value in the world state and notify others
+	world_state.set_value(self.name, destination)
+	
 	# Notify peers that pushable has started moving
 	for peer in world_state.local_peers:
 		rpc_id(peer, "_do_move", direction)

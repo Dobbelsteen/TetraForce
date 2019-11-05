@@ -137,6 +137,7 @@ func state_fall():
 		state = "default"
 
 func state_menu():
+	return
 	if Input.is_action_just_pressed("ui_select") && world_state.local_map.get_node("HUD/Inventory"):
 		world_state.local_map.get_node("HUD/Inventory").queue_free()
 		state = "default"
@@ -183,12 +184,12 @@ func loop_action_button():
 				for peer in world_state.local_peers:
 					rpc_id(peer, "use_item", global.get_item_path(equip_slot[btn]), btn)
 				
-		if Input.is_action_just_pressed("ui_select"):
-			show_inventory()
-			state = "menu"
-		elif Input.is_action_just_pressed("TOGGLE_CHAT") || Input.is_action_just_pressed("ui_accept"):
-			show_chat()
-			state = "menu"
+		#if Input.is_action_just_pressed("ui_select"):
+		#	show_inventory()
+		#	state = "menu"
+		#elif Input.is_action_just_pressed("TOGGLE_CHAT") || Input.is_action_just_pressed("ui_accept"):
+		#	show_chat()
+		#	state = "menu"
 		
 func show_inventory():
 	return

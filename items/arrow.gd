@@ -27,7 +27,7 @@ func start():
 			movedir = Vector2.UP
 			rotation_degrees = 270
 	
-	get_parent().remove_child(self)
+	shooter.remove_child(self)
 	shooter.get_parent().add_child(self)
 	
 	position = shooter.position

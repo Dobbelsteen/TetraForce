@@ -1,13 +1,14 @@
 extends Entity
 
-export (float) var timer
+export (float) var timer = 3
 export (String) var direction
-var shoottimer = 0
+var shoot_timer = 0
 
 func _init():
 	TYPE = "TRAP"
 
 func _ready():
+	shoot_timer = timer
 	spritedir = direction
 	if ["Left", "Up", "Right", "Down"].has(spritedir):
 		$AnimatedSprite.set_animation(spritedir.to_lower())
@@ -17,10 +18,10 @@ func _physics_process(delta):
 	if !is_scene_owner():
 		return
 	
-	if shoottimer >= 0:
-		shoottimer -= 1
+	if shoot_timer >= 0:
+		shoot_timer -= delta
 	else:
 		use_item("res://items/arrow.tscn", "A")
 		for peer in world_state.local_peers:
 			rpc_id(peer, "use_item", "res://items/arrow.tscn", "A")
-		shoottimer = timer
+		shoot_timer = timer
