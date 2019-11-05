@@ -13,6 +13,8 @@ var _timer # Timer object reference to keep track of server timeout
 var _got_state = false # whether a client got the state of the server yet or not
 
 signal got_state
+signal set_game_state(key, value)
+signal get_game_state(key, value)
 
 func _ready() -> void:
 	call_deferred("_prepare") # Wait 1 tick to make sure data is properly set on world

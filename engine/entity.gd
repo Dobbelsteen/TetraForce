@@ -30,7 +30,7 @@ var state = "default"
 
 var home_position = Vector2(0,0)
 
-onready var anim = $AnimationPlayer
+onready var anim : AnimationPlayer
 onready var sprite = $Sprite
 var hitbox # to be defined by create_hitbox()
 
@@ -42,7 +42,8 @@ var entity_shader = preload("res://engine/entity.shader")
 var room : Room
 
 func _ready():
-	
+	if has_node("AnimationPlayer"):
+		anim = $AnimationPlayer
 	texture_default = sprite.texture
 	
 	# Create default material if one does not exist...
@@ -190,6 +191,7 @@ sync func use_item(item, input):
 	newitem.add_to_group(name)
 	add_child(newitem)
 	
+	# TODO: is this same as scene master.? .I ..gues.s it works 
 	if is_network_master():
 		newitem.set_network_master(get_tree().get_network_unique_id())
 	

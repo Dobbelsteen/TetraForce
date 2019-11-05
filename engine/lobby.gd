@@ -32,6 +32,7 @@ func _server_disconnected():
 ##### Game creation functions ######
 
 func _end_game(with_error=""):
+	 # TODO: Move clear() to world state maybe
 	network.clear() # handle clearing out the network immediately (this is why we connected deferred above)
 	show()
 	
@@ -100,7 +101,6 @@ func _on_join_pressed():
 	get_node("panel/host").set_disabled(true)
 	
 	#connect("client_connected_to_server", self, "_connected_ok")
-	world_state.prepare_world_state(false)
 	# Once we get the world state, we can create the actual level.
 	world_state.connect("got_world_state", self, "_connected_ok")
 	
@@ -108,6 +108,8 @@ func _on_join_pressed():
 	host.set_compression_mode(NetworkedMultiplayerENet.COMPRESS_RANGE_CODER)
 	host.create_client(ip,DEFAULT_PORT)
 	get_tree().set_network_peer(host)
+	
+	world_state.prepare_world_state(false)
 	
 	_set_status("Connecting...",true)
 	

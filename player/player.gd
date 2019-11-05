@@ -73,9 +73,10 @@ func _physics_process(delta):
 		"menu":
 			state_menu()
 	
+	# TODO: I reckon these ticks should be independent of physics.
+	# Make a timer that signals when the action CD is ready, and call it from wherever
 	if action_cooldown > 0:
 		action_cooldown -= 1
-	
 	#if movedir.length() > 1:
 	#	$Sprite.global_position = global_position.snapped(Vector2(1,1))
 

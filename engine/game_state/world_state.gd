@@ -30,6 +30,31 @@ var _got_world_state = false # whether a client got the state of the server yet 
 signal got_world_state
 
 
+func set_value(key, value):
+	if !updated_state.has(key) || updated_state[key] != value: 
+		updated_state[key] = value
+		# Notify others of the change
+		if player_id == 1:
+			rpc('_remote_set_value', key, value)
+		else:
+			for player in players:
+				if player != player_id:
+					rpc_id(player, '_remote_set_value', key, value)
+
+
+remote func _remote_set_value(key, value):
+	updated_state[key] = value
+
+func get_value(key):
+	# Wait until we get the world state values
+	if !_got_world_state:
+		yield(self, "got_world_state")
+	
+	if updated_state.has(key):
+		return updated_state[key]
+	else:
+		return null
+
 func get_local_map_owner():
 	if !local_map:
 		return -1 # This shouldn't happen
@@ -41,7 +66,7 @@ func prepare_world_state(is_owner) -> void:
 	if is_world_owner:
 		_owner_joined_world()
 	else:
-		_client_joined_world()
+		get_tree().connect("network_peer_connected", self, "_client_joined_world")
 
 
 # Should be called by exits/teleports to annouce a player changing maps
@@ -160,10 +185,13 @@ func _remove_player_from_map(id, map):
 	# Remove player from local map if the local player is on that map
 	if players[player_id] == map:
 		# Remove player from map scene
-		local_map.call_deferred("remove_player", id)
+		if local_map:
+			local_map.call_deferred("remove_player", id)
 
 
-func _client_joined_world():
+func _client_joined_world(id):
+	player_id = get_tree().get_network_unique_id()
+	get_tree().disconnect("network_peer_connected", self, "_client_joined_world")
 	rpc_id(1, "_send_world_state_to_peer")
 	
 	_timer = Timer.new()
@@ -192,12 +220,11 @@ remote func _get_world_state_from_owner(state, player_list, map_owners_list):
 	emit_signal("got_world_state")
 	network_debugger.write_log("Got world state from server")
 	network_debugger.write_log(str(players))
+	network_debugger.write_log(str(state))
 	
 	player_id = get_tree().get_network_unique_id()
 	
 	_create_world(player_id)
-
-
 
 func _on_server_timeout():
 	_connects_attempted += 1
@@ -207,5 +234,5 @@ func _on_server_timeout():
 		return # Everything was fine
 	
 	if _connects_attempted <= CONNECT_ATTEMPTS:
-		_client_joined_world() # Just try again
+		_client_joined_world(player_id) # Just try again
 		return

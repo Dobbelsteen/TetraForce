@@ -14,17 +14,12 @@ func _ready():
 	puppet_anim = "idle"
 	anim_switch("idle")
 	anim.connect("animation_finished", self, "to_steady_state")
-	connect("update_animation", self, "_on_update_animation")
-
-func _on_update_animation(value):
-	rset_map("puppet_anim", value)
+	set_process(false)
+	set_physics_process(false)
 
 func puppet_update():
 	if anim.current_animation != puppet_anim:
 		anim.play(puppet_anim)
-
-func _process(delta):
-	loop_network()
 
 func show_spikes(area):
 	if !is_actionable_collision(area):

@@ -76,11 +76,6 @@ direction = "Left"
 position = Vector2( 424, 168 )
 timer = 100.0
 direction = "Down"
-
-[node name="arrowtrap4" parent="." instance=ExtResource( 9 )]
-position = Vector2( 344, 168 )
-timer = 100.0
-direction = "Down"
 [connection signal="on_done_moving" from="Pushable" to="Door" method="unlock"]
 [connection signal="on_done_moving" from="Pushable2" to="Door3" method="unlock"]
 [connection signal="on_done_moving" from="Pushable2" to="Door2" method="unlock"]

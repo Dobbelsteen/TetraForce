@@ -51,9 +51,9 @@ remote func _receive_my_player_data(new_player_data):
 	rpc("_receive_all_player_data", player_data)
 
 	
-func clear():
-	if is_instance_valid(current_map):
-		current_map.free()
+func clear(): # TODO: Move this to world state maybe, or at least the call to it
+	if is_instance_valid(world_state.local_map):
+		world_state.local_map.free()
 
 	active_maps.clear()
 	current_players.clear()

@@ -10,14 +10,16 @@ func _ready():
 	pass
 
 func body_entered(body):
+	# TODO: Figure out a way to improve this
 	if get_tree().get_network_unique_id() == int(body.name):
 		pickup(body)
 
 func area_entered(area):
 	if area.get_parent().name == "Sword":
 		var player = area.get_parent().get_parent()
+		# TODO: Same.
 		if get_tree().get_network_unique_id() == int(player.name):
-			pickup(player)
+			pickup(player) # TODO: Should also update this for the local player
 
 func pickup(player):
 	pass

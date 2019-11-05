@@ -19,14 +19,18 @@ onready var ray := $RayCast2D
 onready var destination := position
 
 
-
 func _ready():
 	set_physics_process(false)
 	add_to_group("pushable")
 	
 	$Tween.connect("tween_completed", self, "_done_moving")
+	world_state.connect('got_world_state', self, "_update_state")
+	
+	var new_state = world_state.get_value(self.name)
+	if new_state != null:
+		_update_state(new_state)
 	# Ask for pushable state if needed (this must be deferred because the map_owners variable is 1 tick late after this _ready)
-	call_deferred("_ask_coords")
+	#call_deferred("_ask_coords")
 
 
 func interact(node):
@@ -54,6 +58,8 @@ func stop_interact():
 # Pushable has stopped moving (callback from tween_completed)
 func _done_moving(node, key) -> void:
 	is_moving = false
+	world_state.set_value(self.name, destination)
+	print(world_state.updated_state)
 	
 	emit_signal('on_done_moving') # Signal anyone who cares
 	# If pushable is not a one shot, add it back to the pushable group
@@ -94,23 +100,10 @@ remote func _do_move(direction):
 	tween.start()
 
 
-# If we're not the map_owner, ask host for updated pushable state
-func _ask_coords():
-	if !world_state.is_map_owner:
-		rpc_id(world_state.local_map_owner, "_get_state")
-
-
-# Function called when peer requests pushable state
-remote func _get_state():
-	# Only need to return the state if the object has been pushed, otherwise we can ignore this request
-	if has_been_pushed:
-		rpc_id(get_tree().get_rpc_sender_id(), "_update_state", destination)
-
-
 # Function called when peer recieves updated pushable state
-remote func _update_state(pos):
-	position = pos
-	destination = pos
+remote func _update_state(new_position):
+	position = new_position
+	destination = new_position
 	has_been_pushed = true # we can infer this value from the fact that we only get a response if the block has been pushed
 	
 	# Signal anyone who cares, if we do this, then attached events are synced as well
