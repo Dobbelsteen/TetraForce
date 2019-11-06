@@ -4,13 +4,8 @@ extends Control
 const DEFAULT_PORT = 4564 # some random number, pick your port properly
 const MAX_PEERS = 15 # Maximum amount of players
 
-signal client_connected_to_server
-
-var connection_success = false
-
-var map = "res://maps/overworld.tscn"
+var map = "res://maps/overworld.tmx"
 onready var host = settings.get_pref("host_address")
-
 
 # callback from SceneTree, only for clients (not server)
 func _connected_ok():

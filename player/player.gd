@@ -8,7 +8,6 @@ var push_target = null
 # synced from engine/global.gd
 var equip_slot
 var items
-var item_resources
 
 var spinAtk = false
 onready var holdTimer = $HoldTimer
@@ -29,7 +28,6 @@ func _ready():
 	add_to_group("player")
 	ray.add_exception(hitbox)
 	
-	update_item_resources()
 	connect_camera()
 	
 	$PlayerName.visible = settings.get_pref("show_name_tags")
@@ -113,7 +111,7 @@ func state_hold():
 	else:
 		anim_switch("idle")
 	
-	if !Input.is_action_pressed(controller.A) && !Input.is_action_pressed(controller.B):
+	if !has_node("Sword"):
 		state = "default"
 
 func state_spin():
@@ -205,14 +203,6 @@ func show_chat():
 	world_state.local_map.get_node("HUD").add_child(chat)
 	chat.message_log = chat_messages
 	chat.start()
-
-
-func update_item_resources():
-	item_resources = []
-	if typeof(items) != TYPE_ARRAY:
-		return
-	for item in items:
-		item_resources.append(global.get_item_path(item))
 
 func connect_camera():
 	camera.connect("screen_change_started", self, "screen_change_started")
