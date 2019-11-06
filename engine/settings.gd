@@ -63,7 +63,7 @@ func _load_from_preferences() -> void:
 func _save_to_preferences() -> void:
 	var saveGame = File.new()
 	saveGame.open(_get_save_file(), File.WRITE)
-
+	
 	var line = JSON.print(_user_prefs)
 	saveGame.store_string(String(line))
 	saveGame.close()

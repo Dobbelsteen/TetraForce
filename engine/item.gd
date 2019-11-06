@@ -14,9 +14,11 @@ func _ready():
 	add_to_group("item")
 	set_physics_process(false)
 
-sync func hit():
+remote func hit():
 	if delete_on_hit:
-		rpc("delete")
+		delete()
+		for peer in world_state.local_peers:
+			rpc_id(peer, "delete")
 
-sync func delete():
+remote func delete():
 	queue_free()

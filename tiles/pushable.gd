@@ -26,7 +26,8 @@ func _ready():
 	$Tween.connect("tween_completed", self, "_done_moving")
 	
 	var new_state = world_state.get_value(self.name)
-	if new_state != null:
+	
+	if typeof(new_state) == TYPE_VECTOR2:
 		_update_state(new_state)
 
 

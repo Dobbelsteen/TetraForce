@@ -10,18 +10,41 @@ var original_state = {}
 var updated_state = {}
 
 var _timer # Timer object reference to keep track of server timeout
-var _got_state = false # whether a client got the state of the server yet or not
+var got_state = false # whether a client got the state of the server yet or not
 
 signal got_state
 signal set_game_state(key, value)
 signal get_game_state(key, value)
 
 func _ready() -> void:
-	call_deferred("_prepare") # Wait 1 tick to make sure data is properly set on world
+	call_deferred("_prepare") # Wait 1 tick to make sure data is properly set on world_state
 
+func set_value(key: String, value):
+	if !updated_state.has(key) || updated_state[key] != value: 
+		updated_state[key] = value
+		return # TODO: Check how we want to handle this crap. Whether we send it over network or not
+		# Notify others of the change
+		if world_state.player_id == 1:
+			rpc('_remote_set_value', key, value)
+		else:
+			for player in world_state.players:
+				if player != world_state.player_id:
+					rpc_id(player, '_remote_set_value', key, value)
+	
+func get_value(key: String):
+	# Wait until we get the world state values
+	if !got_state:
+		return null
+	#	yield(self, "got_state")
+	
+	if updated_state.has(key):
+		return [updated_state[key]] # Return as array to differentiate from 0 when 0 is the state value
+	else:
+		return null
+	pass
 
 func _prepare() -> void:
-	if world_state.is_map_owner:
+	if world_state.is_map_owner || !world_state.is_multiplayer:
 		_owner_joined_scene()
 	else:
 		_client_joined_scene()
@@ -32,7 +55,7 @@ func _owner_joined_scene():
 	_prepare_data()
 	# Connect self to stuff
 	#keep track of ALL scene changes
-	_got_state = true
+	got_state = true
 	emit_signal("got_state")
 	network_debugger.write_log("Initialized state as scene owner")
 
@@ -48,9 +71,9 @@ remote func _send_state_to_peer():
 
 remote func _get_state_from_owner(state):
 	updated_state = state
-	_got_state = true
+	got_state = true
 	emit_signal("got_state")
-	network_debugger.write_log("Got state from scene owner")
+	network_debugger.write_log("game_state=" + str(state))
 
 func _client_joined_scene():
 	owner_id = world_state.get_local_map_owner()
@@ -67,7 +90,7 @@ func _client_joined_scene():
 
 func _on_server_timeout():
 	_connects_attempted += 1
-	if _got_state:
+	if got_state:
 		remove_child(_timer)
 		_timer.queue_free()
 		return # Everything was fine

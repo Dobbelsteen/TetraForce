@@ -41,11 +41,13 @@ var entity_shader = preload("res://engine/entity.shader")
 
 var room : Room
 
+var game_state # a reference to the game_state, not to be confused with world
+
 func _ready():
 	if has_node("AnimationPlayer"):
 		anim = $AnimationPlayer
 	texture_default = sprite.texture
-	
+
 	# Create default material if one does not exist...
 	if !sprite.material:
 		sprite.material = ShaderMaterial.new()
@@ -60,6 +62,35 @@ func _ready():
 	
 	room = network.get_room(position)
 	room.add_entity(self)
+	
+	call_deferred("_init_own_state")
+
+
+func _init_own_state():
+	game_state = get_parent().game_state # Save a reference to the game_state. This only works for top level stuff.
+	# TODO: Improve the way game_state is set.
+	network_debugger.write_log("got state? " + str(game_state.got_state))
+	if !game_state: return
+	if !game_state.got_state:
+		network_debugger.write_log("connecting... ")
+		
+		game_state.connect("got_state", self, "_get_state", [true])
+	else:
+		_get_state(false)
+
+func _get_state(should_disconnect_signal: bool):
+	network_debugger.write_log("setting state " + str(should_disconnect_signal))
+	
+	if should_disconnect_signal:
+		game_state.disconnect("got_state", self, "_get_state")
+	var own_state = game_state.get_value(self.name)
+	network_debugger.write_log("got state " + str(own_state))
+	
+	if own_state:
+		set_state(own_state) # Should be defined by Entities that inherit from Entity
+
+func set_state(state: Array):
+	pass
 
 func create_hitbox():
 	var new_hitbox = Area2D.new()
@@ -90,7 +121,7 @@ func puppet_update():
 	pass
 
 func is_scene_owner():
-	return world_state.is_map_owner
+	return !world_state.is_multiplayer || world_state.is_map_owner
 
 
 func is_dead():
@@ -169,6 +200,8 @@ func loop_damage():
 func update_health(delta):
 	health = max(min(health + delta, MAX_HEALTH), 0)
 	emit_signal("health_changed")
+	
+	game_state.set_value(self.name, health)
 
 sync func hurt_texture():
 	sprite.material.set_shader_param("is_hurt", true)
@@ -192,7 +225,7 @@ sync func use_item(item, input):
 	add_child(newitem)
 	
 	# TODO: is this same as scene master.? .I ..gues.s it works 
-	if is_network_master():
+	if world_state.is_multiplayer && is_network_master():
 		newitem.set_network_master(get_tree().get_network_unique_id())
 	
 	if get_tree().get_nodes_in_group(itemgroup).size() > newitem.MAX_AMOUNT:
@@ -224,7 +257,7 @@ func send_chat_message(source, text):
 	world_state.local_map.receive_chat_message(source, text)
 	rpc("receive_chat_message", source, text)
 
-sync func enemy_death():
+remote func enemy_death():
 	if is_scene_owner():
 		choose_subitem(["HEALTH", "RUPEE"], 100)
 	room.remove_entity(self)
@@ -259,6 +292,8 @@ func sync_function_unreliable(f):
 		rpc_unreliable_id(peer, f)
 	
 func sync_property(property, value):
+	if !world_state.is_multiplayer: return
+	
 	if TYPE == "PLAYER":
 		if !is_network_master(): 
 			return
@@ -268,6 +303,8 @@ func sync_property(property, value):
 	rset_map(property, value)
 
 func sync_property_unreliable(property, value):
+	if !world_state.is_multiplayer: return
+	
 	if TYPE == "PLAYER":
 		if !is_network_master(): 
 			return

@@ -13,5 +13,12 @@ func _ready():
 
 func check_for_death():
 	print("checking for death ", health)
-	if health == 0:
-		rpc("enemy_death")
+	if health == 0 :
+		enemy_death()
+		for peer in world_state.local_peers:
+			rpc_id(peer, "enemy_death")
+
+func set_state(state): # state is returned as [state], so var local_state = state[0]
+	health = state[0]
+	if health <= 0:
+		set_dead() # Immediatly set enemy to dead, skip animation/loot

@@ -1,31 +1,31 @@
 extends Node
 
-const SERVER_TIMEOUT = 2 # Max time to wait for server to respond
-const CONNECT_ATTEMPTS = 10 # Max amount of tries to get game state before taking over map
-var _connects_attempted = 0
+const SERVER_TIMEOUT: = 2 # Max time to wait for server to respond
+const CONNECT_ATTEMPTS: = 10 # Max amount of tries to get game state before taking over map
+var _connects_attempted: = 0
 
 # Kinda have to hardcode these for now.
-var START_SCENE = "res://maps/overworld.tscn"
-var START_SCENE_NAME = "overworld"
+var START_SCENE: = "res://maps/overworld.tscn"
+var START_SCENE_NAME: = "overworld"
 
-var original_state = {}
-var updated_state = {}
+var original_state: = {}
+var updated_state: = {}
 
-var is_world_owner = false
-var is_map_owner = false # Precache whether or not the local player is the map owner of his/her map
-var local_map_owner = -1 # If not, store the id of the local_map_owner
+var is_world_owner: = false
+var is_map_owner: = false # Precache whether or not the local player is the map owner of his/her map
+var local_map_owner: = -1 # If not, store the id of the local_map_owner
 
-var is_multiplayer = false
+var is_multiplayer: = false
 
-var player_id = -1
-var players = {} # Dictionary of players + their map, eg. {1: "overworld", 1321564: "testmap"}
-var map_owners = {} # Dictionary of maps + their owner, eg. {"overworld": 1, "testmap": 123123123}
+var player_id: = -1
+var players: = {} # Dictionary of players + their map, eg. {1: "overworld", 1321564: "testmap"}
+var map_owners: = {} # Dictionary of maps + their owner, eg. {"overworld": 1, "testmap": 123123123}
 
 var local_map = null
-var local_peers = [] # Peers of local player for local map
+var local_peers: = [] # Peers of local player for local map
 
 var _timer # Timer object reference to keep track of server timeout
-var _got_world_state = false # whether a client got the state of the server yet or not
+var _got_world_state: = false # whether a client got the state of the server yet or not
 
 signal got_world_state
 
@@ -48,6 +48,7 @@ remote func _remote_set_value(key, value):
 func get_value(key):
 	# Wait until we get the world state values
 	if !_got_world_state:
+		# TODO: Should use timeout instead of yield tbh
 		yield(self, "got_world_state")
 	
 	if updated_state.has(key):
@@ -73,7 +74,9 @@ func prepare_world_state(is_owner) -> void:
 func announce_map_change(map):
 	network_debugger.write_log("Me, Player " + str(player_id) + " changed map to " + map)
 	_player_enters_map(player_id, map)
-	rpc("_notify_player_map_change", map)
+	
+	if is_multiplayer:
+		rpc("_notify_player_map_change", map)
 
 
 func _create_world(id): # Create the world for a player_id
@@ -97,7 +100,7 @@ func _owner_joined_world():
 	emit_signal("got_world_state")
 	network_debugger.write_log("Initialized world as world owner")
 	player_id = 1
-	_create_world(1)
+	call_deferred("_create_world", 1)
 
 
 func _add_player(id):
@@ -224,7 +227,7 @@ remote func _get_world_state_from_owner(state, player_list, map_owners_list):
 	
 	player_id = get_tree().get_network_unique_id()
 	
-	_create_world(player_id)
+	call_deferred("_create_world", player_id)
 
 func _on_server_timeout():
 	_connects_attempted += 1

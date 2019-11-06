@@ -44,3 +44,4 @@ func puppet_update():
 
 func _process(delta):
 	loop_network()
+
