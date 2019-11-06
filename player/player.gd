@@ -209,9 +209,10 @@ func show_chat():
 
 func update_item_resources():
 	item_resources = []
+	if typeof(items) != TYPE_ARRAY:
+		return
 	for item in items:
 		item_resources.append(global.get_item_path(item))
-	print(item_resources)
 
 func connect_camera():
 	camera.connect("screen_change_started", self, "screen_change_started")

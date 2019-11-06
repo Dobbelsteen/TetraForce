@@ -1,7 +1,7 @@
 extends Node
 
-var game_state
 signal player_entered
+var game_state
 
 func _ready():
 	world_state.local_map = self
@@ -75,11 +75,12 @@ func add_new_player(id):
 	new_player.position = get_node("Spawn").position
 	new_player.initialize()
 	
-	if id == get_tree().get_network_unique_id():
+	if  id == get_tree().get_network_unique_id():
 		new_player.get_node("Sprite").texture = load(network.my_player_data.skin)
 		new_player.texture_default = load(network.my_player_data.skin)
 		new_player.set_player_label(network.my_player_data.name)
 	else:
+		
 		new_player.get_node("Sprite").texture = load(network.player_data.get(id).skin)
 		new_player.texture_default = load(network.player_data.get(id).skin)
 		new_player.set_player_label(network.player_data.get(id).name)

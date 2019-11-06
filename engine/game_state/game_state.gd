@@ -44,7 +44,7 @@ func get_value(key: String):
 	pass
 
 func _prepare() -> void:
-	if world_state.is_map_owner || !world_state.is_multiplayer:
+	if world_state.is_map_owner:
 		_owner_joined_scene()
 	else:
 		_client_joined_scene()

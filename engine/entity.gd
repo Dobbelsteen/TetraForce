@@ -107,8 +107,7 @@ func create_hitbox():
 	hitbox = new_hitbox
 
 func loop_network():
-	if !world_state.is_multiplayer:
-		return
+	# Probably don't want to be doing this every tick
 	set_network_master(world_state.map_owners[world_state.local_map.name])
 	if !world_state.is_map_owner:
 		puppet_update()
@@ -121,7 +120,7 @@ func puppet_update():
 	pass
 
 func is_scene_owner():
-	return !world_state.is_multiplayer || world_state.is_map_owner
+	return world_state.is_map_owner
 
 
 func is_dead():
@@ -225,7 +224,7 @@ sync func use_item(item, input):
 	add_child(newitem)
 	
 	# TODO: is this same as scene master.? .I ..gues.s it works 
-	if world_state.is_multiplayer && is_network_master():
+	if is_network_master():
 		newitem.set_network_master(get_tree().get_network_unique_id())
 	
 	if get_tree().get_nodes_in_group(itemgroup).size() > newitem.MAX_AMOUNT:
