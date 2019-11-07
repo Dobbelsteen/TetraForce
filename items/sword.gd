@@ -58,9 +58,9 @@ sync func delete():
 	queue_free()
 
 func _physics_process(delta):
-	if get_parent().has_method("state_hold") and get_parent().state != "spin":
+	if get_parent().has_method("state_hold") && get_parent().state != "spin":
 		get_parent().state = "hold"
-		if get_parent().holdTimer.is_stopped() and !get_parent().spinAtk:
+		if get_parent().holdTimer.is_stopped() && !get_parent().spinAtk:
 			get_parent().holdTimer.start()
 	
 	if get_parent().spinAtk && get_parent().state != "spin" && anim.current_animation != "flash":
@@ -70,7 +70,7 @@ func _physics_process(delta):
 	
 	if !Input.is_action_pressed(input):
 		# Spin attack
-		if get_parent().has_method("state_spin") and get_parent().spinAtk and get_parent().state != "spin":
+		if get_parent().has_method("state_spin") && get_parent().spinAtk && get_parent().state != "spin":
 			delete_on_hit = false
 			get_parent().state = "spin"
 			anim.play("spin")

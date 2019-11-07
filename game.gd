@@ -3,6 +3,8 @@ extends Node
 signal player_entered
 var game_state
 
+var counter: = 0.0
+
 func _ready():
 	world_state.local_map = self
 	
@@ -22,21 +24,12 @@ func _ready():
 	screenfx.play("fadein")
 	screenfx.stop() # Wait on the first frame until state is loaded
 	
-	# defer these connections to make sure all elements are attached and ready
-	call_deferred("_connect_transitions")
-	
 	# Should keep the effect white until we get the gamestate from the server, if needed.
 	set_process(false)
 
 func _state_loaded():
 	set_process(true)	
 	screenfx.play()
-
-func _connect_transitions():
-	# On these 2 signals, we want to check whether we want to activate enemies or not
-	screenfx.connect("animation_finished", self, "initialize_enemy_process")
-	if has_node("Camera"): # Should always be true, but can't be sure enough.
-		$Camera.connect("screen_change_completed", self, "_set_enemy_physics_processes")
 
 # Stops all physics processes in the current rooms
 func halt_physics_processes():
@@ -47,13 +40,21 @@ func halt_physics_processes():
 func initialize_enemy_process(anim):
 	_set_enemy_physics_processes()
 
+func _process(delta):
+	if world_state.is_map_owner:
+		# Only update enemy physics processes every .2s, works, but not good.
+		# TODO: Make it better, rely on events instead of on process
+		counter += delta
+		if counter > 0.2:
+			counter = 0.0
+			_set_enemy_physics_processes()
+
 func _set_enemy_physics_processes():
 	var visible_enemies = []
 	for entity_detect in get_tree().get_nodes_in_group("entity_detect"):
 		for entity in entity_detect.get_overlapping_bodies():
 			if entity.is_in_group("enemy"):
 				visible_enemies.append(entity)
-
 	for enemy in get_tree().get_nodes_in_group("enemy"):
 		if visible_enemies.has(enemy):
 			enemy.set_physics_process(true)
@@ -70,7 +71,6 @@ func add_new_player(id):
 	var entity_detect = preload("res://engine/entity_detect.tscn").instance()
 	entity_detect.player = new_player
 	add_child(entity_detect)
-	
 	add_child(new_player)
 	new_player.position = get_node("Spawn").position
 	new_player.initialize()
@@ -80,7 +80,6 @@ func add_new_player(id):
 		new_player.texture_default = load(network.my_player_data.skin)
 		new_player.set_player_label(network.my_player_data.name)
 	else:
-		
 		new_player.get_node("Sprite").texture = load(network.player_data.get(id).skin)
 		new_player.texture_default = load(network.player_data.get(id).skin)
 		new_player.set_player_label(network.player_data.get(id).name)

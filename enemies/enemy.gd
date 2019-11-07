@@ -12,7 +12,6 @@ func _ready():
 	connect("hitstun_end", self, "check_for_death")
 
 func check_for_death():
-	print("checking for death ", health)
 	if health == 0 :
 		enemy_death()
 		for peer in world_state.local_peers:
@@ -21,4 +20,4 @@ func check_for_death():
 func set_state(state): # state is returned as [state], so var local_state = state[0]
 	health = state[0]
 	if health <= 0:
-		set_dead() # Immediatly set enemy to dead, skip animation/loot
+		queue_free() # Immediatly remove the enemy

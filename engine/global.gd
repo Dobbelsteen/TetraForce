@@ -6,6 +6,7 @@ extends Node
 # It's called "global" because it's stuff that isn't local to a scene
 
 # We'll also have lists of items and enemies to easily get their path anywhere else in code
+const SCREEN_SIZE = Vector2(256, 144)
 
 var player # this client's player
 
@@ -42,3 +43,8 @@ func get_item_name(item_path):
 
 func get_item_path(item_name):
 	return item_dict[item_name]
+
+static func get_grid_pos(pos):
+	var x = floor(pos.x / SCREEN_SIZE.x)
+	var y = floor(pos.y / SCREEN_SIZE.y)
+	return Vector2(x,y)

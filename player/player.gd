@@ -28,18 +28,15 @@ func _ready():
 	add_to_group("player")
 	ray.add_exception(hitbox)
 	
-	connect_camera()
-	
 	$PlayerName.visible = settings.get_pref("show_name_tags")
 
 func initialize():
 	if is_network_master():
 		camera.initialize(self)
-		
+		connect_camera()
+
 func set_player_label(player_name):
 	$PlayerName.text = player_name
-	
-
 
 func _physics_process(delta):
 	# puppet
@@ -220,3 +217,4 @@ func screen_change_completed():
 func _on_HoldTimer_timeout():
 	spinAtk = true
 	sfx.play(preload("res://items/tink.wav"), 20) # get better sfx
+

@@ -313,5 +313,6 @@ func sync_property_unreliable(property, value):
 	rset_unreliable_map(property, value)
 
 func player_entered(id):
+	pass
 	if is_scene_owner() && is_dead():
 		rpc_id(id, "set_dead")

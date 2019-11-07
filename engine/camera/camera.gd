@@ -1,6 +1,5 @@
 extends Camera2D
 
-const SCREEN_SIZE = Vector2(256, 144)
 const SCROLL_SPEED = 0.6
 
 var target
@@ -19,7 +18,7 @@ func _ready():
 
 func initialize(node):
 	target = node
-	position = get_grid_pos(target.position) * SCREEN_SIZE
+	position = global.get_grid_pos(target.position) * global.SCREEN_SIZE
 	$Tween.connect("tween_started", self, "screen_change_started")
 	$Tween.connect("tween_completed", self, "screen_change_completed")
 	current = true
@@ -33,9 +32,9 @@ func _process(delta): # TODO: Probably don't have to do this in process
 	if player_cam:
 		return # Player cam is taking care of it
 		
-	target_grid_pos = get_grid_pos(target.position)
+	target_grid_pos = global.get_grid_pos(target.position)
 	
-	camera_rect = Rect2(position, SCREEN_SIZE)
+	camera_rect = Rect2(position, global.SCREEN_SIZE)
 	
 	if $Tween.is_active():
 		emit_signal("screen_change")
@@ -46,13 +45,9 @@ func _process(delta): # TODO: Probably don't have to do this in process
 	last_target_grid_pos = target_grid_pos
 
 func scroll_camera():
-	$Tween.interpolate_property(self, "position", last_target_grid_pos * SCREEN_SIZE, target_grid_pos * SCREEN_SIZE, SCROLL_SPEED, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	$Tween.interpolate_property(self, "position", last_target_grid_pos * global.SCREEN_SIZE, target_grid_pos * global.SCREEN_SIZE, SCROLL_SPEED, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	$Tween.start()
 
-func get_grid_pos(pos):
-	var x = floor(pos.x / SCREEN_SIZE.x)
-	var y = floor(pos.y / SCREEN_SIZE.y)
-	return Vector2(x,y)
 
 func screen_change_started(object, nodepath):
 	emit_signal("screen_change_started")

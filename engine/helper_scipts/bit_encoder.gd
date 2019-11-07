@@ -26,36 +26,36 @@ var EXAMPLE = CHECK_1 | CHECK_3 | CHECK_5
 
 
 func _ready():
-    weakness = ELEM_ELECTRIC | ELEM_FIRE
-    
-    print(are_bits_enabled(weakness, [ELEM_ICE, ELEM_ELECTRIC, ELEM_FIRE]))
-    
-    var mask = ELEM_FIRE
-    
-    
-    if ELEM_ELECTRIC & weakness == ELEM_ELECTRIC:
-        print('weak to electric')
-    if ELEM_FIRE & weakness == ELEM_FIRE:
-        print('weak to fire')
-    if weakness & (ELEM_FIRE | ELEM_ELECTRIC):
-        print("weak to both")
-    if !(weakness & ELEM_WATER):
-        print("not weak to water")
-        print(~weakness)
-        print(weakness)
+	weakness = ELEM_ELECTRIC | ELEM_FIRE
+	
+	print(are_bits_enabled(weakness, [ELEM_ICE, ELEM_ELECTRIC, ELEM_FIRE]))
+	
+	var mask = ELEM_FIRE
+	
+	
+	if ELEM_ELECTRIC & weakness == ELEM_ELECTRIC:
+		print('weak to electric')
+	if ELEM_FIRE & weakness == ELEM_FIRE:
+		print('weak to fire')
+	if weakness & (ELEM_FIRE | ELEM_ELECTRIC):
+		print("weak to both")
+	if !(weakness & ELEM_WATER):
+		print("not weak to water")
+		print(~weakness)
+		print(weakness)
 
 
 func is_bit_enabled(mask, index):
-    return mask & (1 << index) != 0
+	return mask & (1 << index) != 0
 
 func enable_bit(mask, index):
-    return mask | (1 << index)
+	return mask | (1 << index)
 
 func disable_bit(mask, index):
-    return mask & ~(1 << index)
+	return mask & ~(1 << index)
 
 func are_bits_enabled(mask, indexes: Array):
-    var compare_mask = 0
-    for index in indexes:
-            compare_mask = compare_mask | index
-    return compare_mask & mask == compare_mask
+	var compare_mask = 0
+	for index in indexes:
+			compare_mask = compare_mask | index
+	return compare_mask & mask == compare_mask
