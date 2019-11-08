@@ -11,7 +11,7 @@ func _ready():
 	movedir = entity_helper.rand_direction()
 
 func _physics_process(delta):
-	if !is_scene_owner() || is_dead():
+	if !world_state.is_map_owner || is_dead():
 		return
 	
 	loop_movement()

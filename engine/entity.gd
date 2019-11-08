@@ -140,6 +140,7 @@ func loop_movement():
 	# 	sync_property("puppet_pos", position)
 	
 	move_and_slide(motion)
+	
 	sync_property_unreliable("puppet_pos", position)
 	
 	if movedir != Vector2.ZERO:
@@ -257,7 +258,7 @@ func send_chat_message(source, text):
 	rpc("receive_chat_message", source, text)
 
 remote func enemy_death():
-	if is_scene_owner():
+	if world_state.is_map_owner:
 		choose_subitem(["HEALTH", "RUPEE"], 100)
 	room.remove_entity(self)
 	var death_animation = preload("res://enemies/enemy_death.tscn").instance()
@@ -297,7 +298,7 @@ func sync_property(property, value):
 		if !is_network_master(): 
 			return
 	else: 
-		if !is_scene_owner():
+		if !world_state.is_map_owner:
 			return
 	rset_map(property, value)
 
@@ -308,11 +309,11 @@ func sync_property_unreliable(property, value):
 		if !is_network_master(): 
 			return
 	else: 
-		if !is_scene_owner():
+		if !world_state.is_map_owner:
 			return
 	rset_unreliable_map(property, value)
 
 func player_entered(id):
 	pass
-	if is_scene_owner() && is_dead():
+	if world_state.is_map_owner && is_dead():
 		rpc_id(id, "set_dead")

@@ -45,6 +45,4 @@ func get_item_path(item_name):
 	return item_dict[item_name]
 
 static func get_grid_pos(pos):
-	var x = floor(pos.x / SCREEN_SIZE.x)
-	var y = floor(pos.y / SCREEN_SIZE.y)
-	return Vector2(x,y)
+	return Vector2(floor(pos.x / SCREEN_SIZE.x), floor(pos.y / SCREEN_SIZE.y))

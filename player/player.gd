@@ -20,6 +20,8 @@ func _ready():
 		global.set_player_state()
 		var hud = get_parent().get_node("HUD")
 		hud.initialize()
+		if world_state.is_multiplayer:
+			call_deferred("check_if_stuck")
 	
 	puppet_pos = position
 	puppet_spritedir = "Down"
@@ -27,8 +29,14 @@ func _ready():
 	
 	add_to_group("player")
 	ray.add_exception(hitbox)
-	
 	$PlayerName.visible = settings.get_pref("show_name_tags")
+
+func check_if_stuck():
+	for p in get_tree().get_nodes_in_group("player"):
+		if p.name != self.name:
+			print(position, " ", p.position)
+			var distance2Hero = position.distance_to(p.position)
+			print(distance2Hero)
 
 func initialize():
 	if is_network_master():
@@ -53,7 +61,7 @@ func _physics_process(delta):
 			sprite.flip_h = flip
 		
 		return
-	
+		
 	match state:
 		"default":
 			state_default()
@@ -120,6 +128,9 @@ func state_spin():
 func state_fall():
 	anim_switch("jump")
 	position.y += 100 * get_physics_process_delta_time()
+	
+	# Keeps other players updated of animation
+	sync_property_unreliable("puppet_pos", position)
 	
 	$CollisionShape2D.disabled = true
 	var colliding = false

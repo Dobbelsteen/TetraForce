@@ -15,7 +15,7 @@ func _ready():
 	hitbox.queue_free()
 
 func _physics_process(delta):
-	if !is_scene_owner():
+	if !world_state.is_map_owner:
 		return
 	
 	if shoot_timer >= 0:

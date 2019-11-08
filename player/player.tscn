@@ -327,7 +327,7 @@ tracks/0/keys = {
 "values": [ 4, 5 ]
 }
 
-[sub_resource type="RectangleShape2D" id=19]
+[sub_resource type="RectangleShape2D" id=21]
 extents = Vector2( 4.5, 6 )
 
 [sub_resource type="DynamicFont" id=20]
@@ -371,9 +371,8 @@ hframes = 6
 frame = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2( 0, 1 )
-shape = SubResource( 19 )
+shape = SubResource( 21 )
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
 visible = false

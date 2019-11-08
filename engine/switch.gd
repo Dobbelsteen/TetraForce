@@ -16,12 +16,12 @@ func _ready():
 
 # Called in subclasses to update the state on the client or the server.
 func update_state():
-	if is_scene_owner():
+	if world_state.is_map_owner:
 		var new_state = !activated
 	
 		# Call the state change function locally then remotely.
 		change_state(new_state)
-		for peer in network.map_peers:
+		for peer in world_state.local_peers:
 			rpc_id(peer, "change_state", new_state)
 			
 
@@ -36,9 +36,8 @@ func unlock():
 	$CooldownTimer.paused = false
 
 func sync_new_player(id):
-	if is_scene_owner():
+	if world_state.is_map_owner && id != world_state.player_id: # Otherwise you try to sync yourself in single player
 		rpc_id(id, "sync_remote_state", activated, $CooldownTimer.time_left, locked)
-		
 
 remote func sync_remote_state(state: bool, time: float, should_lock: bool):
 	activated = state
@@ -88,20 +87,12 @@ func _update_sprite():
 
 # Deactivate the switch once the TimeoutTimer is finished.
 func finish_cooldown():
-	if is_scene_owner():
+	if world_state.is_map_owner:
 		timeout()
-	
-		for peer in network.map_peers:
+		for peer in world_state.local_peers:
 			rpc_id(peer, "timeout")
 
 remote func timeout():
 	activated = false
 	emit_signal("on_deactivate")
 	_update_sprite()
-
-func is_scene_owner() -> bool:
-	if !network.map_owners.keys().has(network.current_map.name):
-		return false
-	if network.map_owners[network.current_map.name] == get_tree().get_network_unique_id():
-		return true
-	return false
