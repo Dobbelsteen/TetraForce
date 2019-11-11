@@ -49,13 +49,13 @@ func _process(delta: float) -> void: # TODO: Probably don't have to do this in p
 	last_target_grid_pos = target_grid_pos
 
 func scroll_camera() -> void:
-	$Tween.interpolate_property(self, "position", last_target_grid_pos * global.SCREEN_SIZE, target_grid_pos * SCREEN_SIZE, SCROLL_SPEED, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	$Tween.interpolate_property(self, "position", last_target_grid_pos * global.SCREEN_SIZE, target_grid_pos * global.SCREEN_SIZE, SCROLL_SPEED, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	$Tween.start()
 	
 	update_lighting(target_grid_pos)
 	
 func update_lighting(target_grid_pos: Vector2) -> void:
-	var grid_pos: Vector2 = get_grid_pos(target.position)
+	var grid_pos: Vector2 = global.get_grid_pos(target.position)
 	var node_name: String = "room%s%s" % [grid_pos.x, grid_pos.y]
 	
 	var node: Node = get_parent().get_node_or_null(node_name)

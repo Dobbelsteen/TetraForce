@@ -137,8 +137,8 @@ func state_fall() -> void:
 		state = "default"
 
 func state_menu() -> void:
-	if Input.is_action_just_pressed("ui_select") && network.current_map.get_node("HUD/Inventory"):
-		network.current_map.get_node("HUD/Inventory").queue_free()
+	if Input.is_action_just_pressed("ui_select") && world_state.local_map.get_node("HUD/Inventory"):
+		world_state.local_map.get_node("HUD/Inventory").queue_free()
 		state = "default"
 	elif Input.is_action_just_pressed("TOGGLE_CHAT") && world_state.local_map.get_node("HUD/Chat"):
 		world_state.local_map.get_node("HUD/Chat").queue_free()
