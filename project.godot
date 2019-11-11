@@ -71,6 +71,7 @@ room="res://engine/game_state/room.gd"
 world_state="*res://engine/game_state/world_state.gd"
 network_debugger="*res://engine/debug/network_debugger.tscn"
 network="*res://engine/new_network.gd"
+music="*res://engine/music.gd"
 
 [debug]
 

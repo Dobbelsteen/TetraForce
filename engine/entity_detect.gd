@@ -3,10 +3,10 @@ extends Area2D
 var player
 var grid_position
 
-func _ready():
+func _ready() -> void:
 	add_to_group("entity_detect")
 
-func _process(delta):
+func _process(delta) -> void:
 	if !is_instance_valid(player):
 		remove_from_group("entity_detect")
 		queue_free()

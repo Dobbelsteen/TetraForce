@@ -14,8 +14,8 @@ func _ready():
 	game_state = preload("res://engine/game_state/game_state.tscn").instance()
 	add_child(game_state)
 	game_state.connect("got_state", self, "_state_loaded")
-	
-	add_child(preload("res://engine/camera/camera.tscn").instance())
+
+	add_child(camera)
 	add_child(preload("res://ui/hud.tscn").instance())
 	
 	add_new_player(world_state.player_id)
@@ -52,7 +52,7 @@ func _process(delta):
 			_set_enemy_physics_processes()
 
 func _set_enemy_physics_processes():
-	var visible_enemies = []
+	var visible_enemies: Array = []
 	for entity_detect in get_tree().get_nodes_in_group("entity_detect"):
 		for entity in entity_detect.get_overlapping_bodies():
 			if entity.is_in_group("enemy"):
@@ -64,8 +64,7 @@ func _set_enemy_physics_processes():
 			enemy.set_physics_process(false)
 			enemy.position = enemy.home_position
 
-
-func add_new_player(id):
+func add_new_player(id: int) -> void:
 	var new_player = preload("res://player/player.tscn").instance()
 	new_player.name = str(id)
 	new_player.set_network_master(id, true)
@@ -88,16 +87,18 @@ func add_new_player(id):
 	
 	emit_signal("player_entered", id)
 
-func remove_player(id):
-	get_node(str(id)).queue_free() # TODO: Make sure all other player nodes are gone?
+func remove_player(id: int) -> void:
+	get_node(str(id)).queue_free()
+	for node in get_tree().get_nodes_in_group(str(id)):
+		node.queue_free()
 
-remote func spawn_subitem(dropped, pos, subitem_name):
+remote func spawn_subitem(dropped: String, pos: Vector2, subitem_name: String) -> void:
 	var drop_instance = load(dropped).instance()
 	drop_instance.name = subitem_name
 	add_child(drop_instance)
 	drop_instance.global_position = pos
 
-remote func receive_chat_message(source, text):
+remote func receive_chat_message(source: String, text: String) -> void:
 	print_debug("Polo")
 	global.player.chat_messages.append({"source": source, "message": text})
 	var chatBox = get_node("HUD/Chat")

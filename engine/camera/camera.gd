@@ -1,11 +1,11 @@
 extends Camera2D
 
-const SCROLL_SPEED = 0.6
+const SCROLL_SPEED: float = 0.5
 
-var target
-var target_grid_pos = Vector2(0,0)
-var last_target_grid_pos = Vector2(0,0)
-var camera_rect = Rect2()
+var target: Node
+var target_grid_pos: Vector2 = Vector2(0,0)
+var last_target_grid_pos: Vector2 = Vector2(0,0)
+var camera_rect: Rect2 = Rect2()
 
 var current_lighting: String = ""
 
@@ -16,10 +16,10 @@ signal lighting_mode_changed
 
 var player_cam
 
-func _ready():
+func _ready() -> void:
 	set_process(false)
 
-func initialize(node):
+func initialize(node: Node) -> void:
 	target = node
 	position = global.get_grid_pos(target.position) * global.SCREEN_SIZE
 	$Tween.connect("tween_started", self, "screen_change_started")
@@ -29,7 +29,7 @@ func initialize(node):
 	set_process(true)
 	update_lighting(global.get_grid_pos(target.position))
 
-func _process(delta): # TODO: Probably don't have to do this in process
+func _process(delta: float) -> void: # TODO: Probably don't have to do this in process
 	if !is_instance_valid(target):
 		return
 		
@@ -48,28 +48,28 @@ func _process(delta): # TODO: Probably don't have to do this in process
 	
 	last_target_grid_pos = target_grid_pos
 
-func scroll_camera():
-	$Tween.interpolate_property(self, "position", last_target_grid_pos * global.SCREEN_SIZE, target_grid_pos * global.SCREEN_SIZE, SCROLL_SPEED, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+func scroll_camera() -> void:
+	$Tween.interpolate_property(self, "position", last_target_grid_pos * global.SCREEN_SIZE, target_grid_pos * SCREEN_SIZE, SCROLL_SPEED, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	$Tween.start()
 	
 	update_lighting(target_grid_pos)
-
 	
-func update_lighting(target_grid_pos: Vector2):
-	var grid_pos = global.get_grid_pos(target.position)
-	var node_name = "room%s%s" % [grid_pos.x, grid_pos.y]
-	var node = get_parent().get_node_or_null(node_name)
-
+func update_lighting(target_grid_pos: Vector2) -> void:
+	var grid_pos: Vector2 = get_grid_pos(target.position)
+	var node_name: String = "room%s%s" % [grid_pos.x, grid_pos.y]
+	
+	var node: Node = get_parent().get_node_or_null(node_name)
+	
 	if node == null:
 		return
 	
 	var light_data = node.get_meta("light_data")
 	if current_lighting == light_data:
 		return
-		
-	var targetColor = Color(0, 0, 0, 1.0)
+	
+	var targetColor: Color = Color(0, 0, 0, 1.0)
 	var targetEnergy = 1
-	var delay = 0.0
+	var delay: float = 0.0
 	
 	if current_lighting == "dark":
 		delay = 0.3
@@ -92,10 +92,10 @@ func update_lighting(target_grid_pos: Vector2):
 		  
 	emit_signal("lighting_mode_changed", targetEnergy)
 
-func screen_change_started(object, nodepath):
+func screen_change_started(object, nodepath: String) -> void:
 	emit_signal("screen_change_started")
 
-func screen_change_completed(object, nodepath):
+func screen_change_completed(object, nodepath: String) -> void:
 	emit_signal("screen_change_completed")
 
 # Attach a predefined personal camera to the target (being the current player, or so it should be)

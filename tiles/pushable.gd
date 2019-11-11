@@ -2,24 +2,20 @@ extends StaticBody2D
 
 signal on_done_moving
 
-export(float) var time_for_effect = 0.4
-export(float) var push_animation_duration = 1.0
+export(float) var time_for_effect: float = 0.4
+export(float) var push_animation_duration: float = 1.0
+export(bool) var is_one_shot: bool = false
+export(Array) var direction_limits: Array
 
-export(bool) var is_one_shot = false
-export(Array) var direction_limits
-
-
-var has_been_pushed = false
-var time_being_pushed = 0.0
-var is_moving = false
-
+var has_been_pushed: bool = false
+var time_being_pushed: float = 0.0
+var is_moving: bool = false
 
 onready var tween := $Tween
 onready var ray := $RayCast2D
 onready var destination := position
 
-
-func _ready():
+func _ready() -> void:
 	set_physics_process(false)
 	add_to_group("pushable")
 	
@@ -30,8 +26,7 @@ func _ready():
 	if typeof(new_state) == TYPE_VECTOR2:
 		_update_state(new_state)
 
-
-func interact(node):
+func interact(node) -> void:
 	if is_moving: # If the block is already moving, we can't interact anymore
 		return
 	
@@ -48,7 +43,7 @@ func interact(node):
 
 
 # Player stopped interacting, reset the timer and ray
-func stop_interact():
+func stop_interact() -> void:
 	time_being_pushed = 0.0
 	ray.enabled = false
 
@@ -65,9 +60,9 @@ func _done_moving(node, key) -> void:
 
 
 # Prepare the movement
-func _prepare_move(dir):
-	var direction = _get_direction(dir)
-	var is_colliding = ray.is_colliding()
+func _prepare_move(dir) -> void:
+	var direction: Vector2 = _get_direction(dir)
+	var is_colliding: bool = ray.is_colliding()
 	
 	ray.enabled = false # We can disable the raycast for now
 	
@@ -86,7 +81,7 @@ func _prepare_move(dir):
 		rpc_id(peer, "_do_move", direction)
 
 
-remote func _do_move(direction):
+remote func _do_move(direction: Vector2) -> void:
 	if is_moving: # someone else got here first
 		return
 	
@@ -116,7 +111,7 @@ remote func _update_state(new_position):
 
 
 # Helper to get the normalized direction vector
-func _get_direction(dir):
+func _get_direction(dir: String) -> Vector2:
 	match dir:
 		"Up":
 			return Vector2.UP
