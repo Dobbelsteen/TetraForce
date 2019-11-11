@@ -113,6 +113,8 @@ func _on_join_pressed():
 ### INITIALIZER ####
 	
 func _ready():
+	$panel.grab_focus()
+	
 	$panel/address.text = host
 	
 	# connect all the callbacks related to networking

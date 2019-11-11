@@ -5,11 +5,11 @@ const CONNECT_ATTEMPTS: = 10 # Max amount of tries to get game state before taki
 var _connects_attempted: = 0
 
 # Kinda have to hardcode these for now.
-#var START_SCENE: = "res://maps/overworld.tmx"
-var START_SCENE: = "res://maps/testmap.tscn"
+var START_SCENE: = "res://maps/overworld.tmx"
+#var START_SCENE: = "res://maps/testmap.tscn"
 
-#var START_SCENE_NAME: = "overworld"
-var START_SCENE_NAME: = "testmap"
+var START_SCENE_NAME: = "overworld"
+#var START_SCENE_NAME: = "testmap"
 
 var original_state: = {}
 var updated_state: = {}

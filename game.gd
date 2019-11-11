@@ -5,6 +5,8 @@ var game_state
 
 var counter: = 0.0
 
+var camera = preload("res://engine/camera/camera.tscn").instance()
+
 func _ready():
 	world_state.local_map = self
 	

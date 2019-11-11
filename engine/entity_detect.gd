@@ -15,4 +15,3 @@ func _process(delta):
 		if new_grid_position != grid_position:
 			grid_position = new_grid_position
 			position = new_grid_position * global.SCREEN_SIZE
-

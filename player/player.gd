@@ -190,12 +190,12 @@ func loop_action_button():
 				for peer in world_state.local_peers:
 					rpc_id(peer, "use_item", global.get_item_path(equip_slot[btn]), btn)
 				
-		#if Input.is_action_just_pressed("ui_select"):
-		#	show_inventory()
-		#	state = "menu"
-		#elif Input.is_action_just_pressed("TOGGLE_CHAT") || Input.is_action_just_pressed("ui_accept"):
-		#	show_chat()
-		#	state = "menu"
+		if Input.is_action_just_pressed(controller.SELECT):
+			show_inventory()
+			state = "menu"
+		elif Input.is_action_just_pressed("TOGGLE_CHAT") || Input.is_action_just_pressed(controller.START):
+			show_chat()
+			state = "menu"
 		
 func show_inventory():
 	return
@@ -215,15 +215,21 @@ func show_chat():
 func connect_camera():
 	camera.connect("screen_change_started", self, "screen_change_started")
 	camera.connect("screen_change_completed", self, "screen_change_completed")
+	camera.connect("lighting_mode_changed", self, "lighting_mode_changed")
 
 func screen_change_started():
 	set_physics_process(false)
 	room.remove_entity(self)
 
 func screen_change_completed():
+	
 	set_physics_process(true)
 	room = network.get_room(position)
 	room.add_entity(self)
+	
+func lighting_mode_changed(energy):
+	$Tween.interpolate_property($Light2D, "energy", $Light2D.energy, energy, 0.2, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, 0.2)
+	$Tween.start()
 
 func _on_HoldTimer_timeout():
 	spinAtk = true
