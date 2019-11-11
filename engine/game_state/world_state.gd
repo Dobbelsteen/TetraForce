@@ -16,7 +16,7 @@ var updated_state: = {}
 
 var is_world_owner: = false
 var is_map_owner: = false # Precache whether or not the local player is the map owner of his/her map
-var local_map_owner: = -1 # If not, store the id of the local_map_owner
+#var local_map_owner: = -1 # If not, store the id of the local_map_owner
 
 var is_multiplayer: = false
 
@@ -146,7 +146,7 @@ func _player_enters_map(id, map):
 			is_map_owner = true # Map doesn't have an owner, make local player owner
 		map_owners[map] = id # Make this player the owner of the scene
 	
-	# If this affects the local already on the map player, update peers
+	# If this affects the local player, already on the map, update our peers
 	if players[player_id] == map:
 		var new_peers = []
 		for player in players:
@@ -154,7 +154,6 @@ func _player_enters_map(id, map):
 				new_peers.append(player)
 		local_peers = new_peers
 		network.map_peers = local_peers
-		#network.map_peers = map_peers[map]
 		
 		# Add the player to our map
 		if id != player_id:
@@ -178,12 +177,13 @@ func _remove_player_from_map(id, map):
 			var new_owner = players_on_map[0] # new owner is the first of the players left on map
 			map_owners[map] = new_owner # Assign new owner
 			
-			if new_owner == player_id: # If new_owner is current player, make it owner
+			if new_owner == player_id: # If new_owner is local player, make us owner
 				is_map_owner = true
 			players_on_map.erase(player_id) # Remove local player from peer list
 			local_peers = players_on_map
 			network.map_peers = local_peers
 	elif map:
+		# If another player left our map, remove that player from our peers
 		if players[player_id] == map && player_id != id:
 			local_peers.erase(id)
 			network.map_peers = local_peers
