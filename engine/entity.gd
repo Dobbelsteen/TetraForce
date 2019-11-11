@@ -102,7 +102,11 @@ func create_hitbox():
 	
 	var new_shape = RectangleShape2D.new()
 	new_collision.shape = new_shape
-	new_shape.extents = $CollisionShape2D.shape.extents + Vector2(1,1)
+	if TYPE == "PLAYER":
+		# Players get more leeway when it comes to hitbox collision
+		new_shape.extents = $CollisionShape2D.shape.extents - Vector2(1,1)
+	else:
+		new_shape.extents = $CollisionShape2D.shape.extents + Vector2(1,1)
 	
 	hitbox = new_hitbox
 

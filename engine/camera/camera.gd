@@ -80,4 +80,5 @@ func unlock_camera(limits):
 func lock_camera():
 	make_current()
 	target.remove_child(player_cam)
+	player_cam.queue_free()
 	player_cam = null

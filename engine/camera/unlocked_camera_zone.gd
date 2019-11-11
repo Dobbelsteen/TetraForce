@@ -1,5 +1,5 @@
 extends Area2D
-
+tool
 """
 Unlocked camera zone
 Keeps track of players and enemies, it's used to figure out which enemies are in the unlocked region
@@ -13,9 +13,8 @@ func _ready() -> void:
 	add_to_group("entity_detect")
 
 func _on_Area2D_body_entered(body: Entity) -> void:
-	if body.TYPE == "PLAYER" && body.is_network_master():
+	if body && body.TYPE == "PLAYER" && body.is_network_master():
 		var col_shape = $CollisionShape2D.shape.extents
-
 		# Make the camera 1 tile wider and higher than the detection range
 		# This is to ensure smooth transitions when transitioning from locked to unlocked camera (and back)
 		var limits = {
@@ -28,5 +27,5 @@ func _on_Area2D_body_entered(body: Entity) -> void:
 		body.camera.unlock_camera(limits)
 
 func _on_Area2D_body_exited(body: Entity) -> void:
-	if body.TYPE == "PLAYER" && body.is_network_master():
+	if body && body.TYPE == "PLAYER" && body.is_network_master():
 		body.camera.lock_camera()
